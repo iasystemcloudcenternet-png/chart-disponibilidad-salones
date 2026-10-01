@@ -667,7 +667,7 @@
 <div id="toasts" class="toast-wrap"></div>
 
 <script>
-  const RESET_TOKEN = <?!= JSON.stringify(resetToken || '') ?>;
+  const RESET_TOKEN = new URLSearchParams(window.location.search).get('reset') || '';
   const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const SESSION_KEY = 'gd_session_token';
   let currentUser = null;
@@ -2375,7 +2375,18 @@
   function errorText(e){return (e&&e.message)?e.message:'Ocurrió un error inesperado.'}
   function escapeHtml(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
   function escapeAttr(s){return escapeHtml(s).replace(/'/g,'&#039;')}
-  function gas(fn,...args){return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[fn](...args))}
+  async function gas(fn,...args){
+    const response = await fetch('/.netlify/functions/gas-proxy', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({fn, args})
+    });
+    let data;
+    try { data = await response.json(); }
+    catch (_) { throw new Error('El servidor devolvió una respuesta no válida.'); }
+    if (!response.ok) throw new Error((data && data.message) || 'No fue posible comunicarse con el servidor.');
+    return data;
+  }
 </script>
 </body>
 </html>
