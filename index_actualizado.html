@@ -1,0 +1,2381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><?= appName ?></title>
+  <style>
+    :root{
+      --violet:#6d28d9;
+      --violet-2:#8b5cf6;
+      --violet-3:#ede9fe;
+      --ink:#241b35;
+      --muted:#6f6680;
+      --surface:#ffffff;
+      --bg:#f5f3ff;
+      --gold:#d4a72c;
+      --gold-soft:#f7e7a7;
+      --danger:#dc2626;
+      --success:#15803d;
+      --border:#ded8ea;
+      --shadow:0 16px 45px rgba(67,40,105,.12);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(135deg,#f7f3ff 0%,#fbfbff 45%,#f6f1ff 100%);color:var(--ink);min-height:100vh}
+    button,input,select{font:inherit}
+    .hidden{display:none!important}
+    .app-shell{min-height:100vh}
+
+    /* AUTH */
+    .auth-wrap{min-height:100vh;display:grid;grid-template-columns:minmax(320px,1.05fr) minmax(390px,.95fr)}
+    .brand-panel{position:relative;overflow:hidden;background:linear-gradient(145deg,#4c1d95 0%,#6d28d9 55%,#8b5cf6 100%);color:#fff;padding:64px;display:flex;align-items:center}
+    .brand-panel:before,.brand-panel:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.09)}
+    .brand-panel:before{width:460px;height:460px;right:-180px;top:-130px}
+    .brand-panel:after{width:300px;height:300px;left:-90px;bottom:-100px}
+    .brand-inner{position:relative;z-index:1;max-width:620px}
+    .logo-lockup{display:flex;align-items:center;gap:14px;margin-bottom:44px}
+    .logo-mark{width:62px;height:62px;border-radius:17px;border:2px solid rgba(255,255,255,.72);display:grid;place-items:center;font-weight:900;font-size:23px;letter-spacing:-1px;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 4px rgba(212,167,44,.22)}
+    .logo-text strong{display:block;font-size:20px;letter-spacing:.12em}.logo-text span{font-size:12px;opacity:.78;letter-spacing:.22em}
+    .brand-panel h1{font-size:clamp(34px,5vw,62px);line-height:1.02;margin:0 0 22px;letter-spacing:-.04em}
+    .brand-panel p{font-size:18px;line-height:1.7;max-width:560px;margin:0;opacity:.9}
+    .brand-tags{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}.brand-tag{border:1px solid rgba(255,255,255,.25);padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);font-size:13px}
+
+    .hotel-motion{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:34px;max-width:520px}
+    .hotel-motion-card{height:92px;border-radius:20px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);display:grid;place-items:center;box-shadow:0 14px 35px rgba(25,8,55,.18);backdrop-filter:blur(8px);animation:hotelFloat 3.2s ease-in-out infinite;overflow:hidden}
+    .hotel-motion-card:nth-child(2){animation-delay:-.8s}.hotel-motion-card:nth-child(3){animation-delay:-1.6s}.hotel-motion-card:nth-child(4){animation-delay:-2.4s}
+    .hotel-motion-card svg{width:54px;height:54px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 5px 9px rgba(0,0,0,.12));animation:hotelIconPulse 2.6s ease-in-out infinite}
+    @keyframes hotelFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-10px) rotate(.8deg)}}
+    @keyframes hotelIconPulse{0%,100%{transform:scale(1);opacity:.88}50%{transform:scale(1.08);opacity:1}}
+    @media(max-width:520px){.hotel-motion{grid-template-columns:repeat(2,1fr)}}
+
+    .auth-panel{display:flex;justify-content:center;align-items:center;padding:42px 26px}
+    .auth-card{width:min(470px,100%);background:rgba(255,255,255,.9);backdrop-filter:blur(14px);border:1px solid rgba(109,40,217,.11);box-shadow:var(--shadow);border-radius:26px;padding:34px}
+    .auth-card h2{font-size:30px;margin:0 0 7px;letter-spacing:-.03em}.subtitle{color:var(--muted);margin:0 0 26px;line-height:1.55}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;background:#f1edfa;padding:4px;border-radius:12px;margin-bottom:24px}.tab{border:0;background:transparent;padding:10px;border-radius:9px;cursor:pointer;color:#5f5471;font-weight:700}.tab.active{background:white;color:var(--violet);box-shadow:0 4px 16px rgba(66,38,100,.08)}
+    .field{margin:0 0 16px}.field label{display:block;font-size:13px;font-weight:800;margin-bottom:7px}.field input,.field select{width:100%;border:1px solid var(--border);border-radius:12px;padding:13px 14px;background:#fff;outline:none;transition:.2s}.field input:focus,.field select:focus{border-color:#9f7aea;box-shadow:0 0 0 4px rgba(139,92,246,.12)}
+    .btn{border:0;border-radius:12px;padding:13px 16px;font-weight:800;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn:disabled{opacity:.55;cursor:not-allowed}.btn-primary{width:100%;color:#fff;background:linear-gradient(135deg,var(--violet),var(--violet-2));box-shadow:0 9px 25px rgba(109,40,217,.22)}.btn-primary:hover{transform:translateY(-1px)}.btn-ghost{background:#f3f0fa;color:#5b4677}.btn-danger{background:#fff1f2;color:#b91c1c;border:1px solid #fecdd3}.link-btn{padding:0;background:none;border:0;color:var(--violet);font-weight:800;cursor:pointer}
+    .auth-links{display:flex;justify-content:space-between;gap:12px;margin-top:16px;font-size:13px}.fine{font-size:12px;color:#857b93;line-height:1.5;margin-top:18px}
+
+    /* APP */
+    .topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid #e9e3f3;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .mini-brand{display:flex;align-items:center;gap:11px}.mini-logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(145deg,var(--violet),var(--violet-2));color:white;display:grid;place-items:center;font-weight:900;border:2px solid #e2c66b}.mini-title strong{display:block;font-size:14px;letter-spacing:.07em}.mini-title span{font-size:12px;color:var(--muted)}
+    .userbox{display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--violet-3);color:var(--violet);font-weight:900}.usertext{line-height:1.15;text-align:right}.usertext strong{display:block;font-size:13px}.usertext span{font-size:11px;color:var(--muted)}
+    .main{padding:26px;max-width:1600px;margin:0 auto}.hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:20px}.hero h2{font-size:30px;margin:0 0 6px;letter-spacing:-.03em}.hero p{margin:0;color:var(--muted)}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}.toolbar .field{margin:0;min-width:135px}.toolbar .field label{font-size:11px}.toolbar select{padding:10px 11px}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:12px;margin:16px 0 20px}.stat{background:#fff;border:1px solid #ebe6f3;border-radius:14px;padding:14px 16px;box-shadow:0 6px 20px rgba(58,33,82,.05)}.stat span{font-size:12px;color:var(--muted);display:block}.stat strong{font-size:24px;margin-top:4px;display:block}.stat.av strong{color:#15803d}.stat.oc strong{color:#475569}.stat.te strong{color:#b58105}.stat.ga strong{color:#c81e1e}
+
+    .legend{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 14px}.legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:#665c74}.swatch{width:15px;height:15px;border-radius:4px;border:1px solid #c9c2d3}.swatch.available{background:#eefbf2;border-color:#86c99a}.swatch.occupied{background:#c4b5fd;border-color:#8b5cf6}.swatch.tentative{background:#ffe65a;border-color:#e2c63a}.swatch.guaranteed{background:#ff6961;border-color:#dc2626}.swatch.out_of_service{background:#000;border-color:#000}
+
+    .chart-card{background:#fff;border:1px solid #e8e2f0;border-radius:18px;box-shadow:var(--shadow);overflow:hidden}.chart-scroll{overflow:auto;max-height:calc(100vh - 310px)}
+    table.chart{border-collapse:separate;border-spacing:0;min-width:max-content;width:100%}.chart th,.chart td{border-right:1px solid #ddd7e4;border-bottom:1px solid #ddd7e4;text-align:center;height:34px;min-width:34px;padding:0;font-size:10px}.chart thead th{position:sticky;top:0;z-index:5;background:#f5f1fc;font-weight:900}.chart thead tr:first-child th{top:0}.chart .salon-col{position:sticky;left:0;z-index:7;min-width:230px;max-width:230px;text-align:left;padding:0 12px;background:#fff;font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chart thead .salon-col{z-index:10;background:#5b21b6;color:#fff}.chart .dow{font-size:9px;color:#746984;height:23px}.chart .day{font-weight:900;font-size:11px;height:30px}.slot{position:relative;transition:.12s;cursor:default}.slot:hover{outline:2px solid #7c3aed;outline-offset:-2px;z-index:2}.slot.available{background:#eefbf2}.slot.occupied{background:#fff}.slot.tentative{background:#ffe65a}.slot.guaranteed{background:#ff6961;color:#6e0d0d}.slot.out_of_service{background:#000;color:#fff}.slot .code{display:block;max-width:33px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:900;font-size:9px}.weekend{box-shadow:inset 0 0 0 999px rgba(109,40,217,.028)}
+
+    .deadline-due{background:#c4b5fd!important;color:#2e1065!important;border-color:#8b5cf6!important}
+    .empty-state{padding:54px;text-align:center;color:var(--muted)}.empty-state strong{display:block;color:var(--ink);font-size:18px;margin-bottom:6px}
+    .btn-block{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;box-shadow:0 8px 22px rgba(109,40,217,.2)}
+    .btn-dashboard{background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;box-shadow:0 8px 22px rgba(13,148,136,.18)}
+    .btn-service{background:#111827;color:#fff;box-shadow:0 8px 22px rgba(17,24,39,.22)}.btn-service:hover{background:#000}.btn-service.hidden{display:none!important}
+    .btn-report-main{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;box-shadow:0 8px 22px rgba(37,99,235,.18)}
+    .dashboard-modal{width:min(1450px,98vw);max-height:96vh}
+    .dashboard-body{padding:18px 22px 28px;overflow:auto;background:#f7f5fa}
+    .dashboard-actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+    .dashboard-actions .btn{width:auto}
+    .dashboard-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+    .dashboard-kpi{background:#fff;border:1px solid #e7dfed;border-radius:16px;padding:16px;box-shadow:0 6px 18px rgba(45,31,58,.05)}
+    .dashboard-kpi span{display:block;font-size:10px;font-weight:900;letter-spacing:.06em;color:#756b80;text-transform:uppercase}
+    .dashboard-kpi strong{display:block;font-size:29px;margin-top:5px;color:#31233e}
+    .dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .dashboard-card{background:#fff;border:1px solid #e7dfed;border-radius:16px;padding:16px;box-shadow:0 6px 18px rgba(45,31,58,.05);overflow:hidden}
+    .dashboard-card.full{grid-column:1/-1}
+    .dashboard-card h4{margin:0 0 5px;font-size:16px;color:#332440}
+    .dashboard-card .sub{margin:0 0 12px;color:#766c82;font-size:11px;line-height:1.45}
+    .dash-table-wrap{overflow:auto;max-height:390px;border:1px solid #eee7f3;border-radius:11px}
+    .dash-table{width:100%;border-collapse:collapse;min-width:650px}
+    .dash-table th{position:sticky;top:0;background:#5b21b6;color:#fff;padding:9px 8px;font-size:10px;text-transform:uppercase;text-align:left;z-index:1}
+    .dash-table td{padding:9px 8px;border-bottom:1px solid #eee8f3;font-size:11px;color:#504657;vertical-align:top}
+    .dash-table tr.highlight td{background:#fff4c2;font-weight:800}
+    .dash-table tr:hover td{background:#faf8fd}
+    .chart-canvas-wrap{position:relative;min-height:350px}
+    .chart-canvas-wrap canvas{width:100%;height:350px;display:block}
+    .dash-highlight{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .dash-pill{background:#f4f0f8;border:1px solid #e3d9eb;border-radius:999px;padding:6px 10px;font-size:10px;color:#594d63}
+    .dash-pill strong{color:#4c1d95}
+    .status-chip{display:inline-block;padding:4px 7px;border-radius:999px;font-size:9px;font-weight:900}
+    .status-chip.tentative{background:#fde047;color:#713f12}
+    .status-chip.guaranteed{background:#ff6b6b;color:#7f1d1d}
+    .status-chip.cancelled{background:#e5e7eb;color:#374151}
+    .status-chip.deadline{background:#c4b5fd;color:#4c1d95}
+    .dashboard-loading{padding:60px 20px;text-align:center;color:#766c82}
+    .dashboard-loading strong{display:block;color:#3f314b;font-size:17px;margin-bottom:5px}
+    @media(max-width:1000px){.dashboard-grid{grid-template-columns:1fr}.dashboard-card.full{grid-column:auto}.dashboard-kpis{grid-template-columns:1fr 1fr}}
+    @media(max-width:600px){.dashboard-kpis{grid-template-columns:1fr 1fr}.dashboard-actions{justify-content:flex-start}}
+    .system-report-modal{width:min(1380px,98vw);max-height:96vh}
+    .system-report-body{padding:20px 22px 28px;overflow:auto;background:#f7f5fa}
+    .system-report-summary{display:grid;grid-template-columns:repeat(3,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+    .system-report-kpi{background:#fff;border:1px solid #e7dfed;border-radius:14px;padding:14px 16px;box-shadow:0 5px 16px rgba(45,31,58,.05)}
+    .system-report-kpi span{display:block;font-size:10px;text-transform:uppercase;font-weight:900;color:#756b80;letter-spacing:.05em}.system-report-kpi strong{display:block;margin-top:4px;font-size:25px;color:#31233e}
+    .system-report-month{background:#fff;border:1px solid #e5deec;border-radius:16px;margin:0 0 18px;overflow:hidden;box-shadow:0 6px 18px rgba(45,31,58,.05)}
+    .system-report-month-head{padding:13px 16px;background:linear-gradient(135deg,#5b21b6,#7c3aed);color:#fff;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+    .system-report-month-head strong{font-size:17px}.system-report-month-head span{font-size:11px;font-weight:800;opacity:.92}
+    .system-report-table-wrap{overflow:auto}.system-report-table{width:100%;border-collapse:collapse;min-width:980px}
+    .system-report-table th{background:#f3eff8;color:#4a3d56;padding:9px 8px;text-align:left;font-size:10px;text-transform:uppercase;border-bottom:1px solid #e4ddea}
+    .system-report-table td{padding:9px 8px;border-bottom:1px solid #eee8f3;font-size:11px;color:#504657;vertical-align:top}.system-report-table tr:last-child td{border-bottom:0}
+    .system-report-status{display:inline-block;padding:4px 8px;border-radius:999px;font-size:9px;font-weight:900}.system-report-status.tentative{background:#fde047;color:#713f12}.system-report-status.guaranteed{background:#ff6b6b;color:#7f1d1d}
+    .system-report-empty{padding:55px 20px;text-align:center;color:#766c82}.system-report-empty strong{display:block;color:#3f314b;font-size:17px;margin-bottom:5px}
+    @media(max-width:700px){.system-report-summary{grid-template-columns:1fr 1fr 1fr}}
+    @media print{
+      body.printing-dashboard *{visibility:hidden!important}
+      body.printing-dashboard #dashboardModal,
+      body.printing-dashboard #dashboardModal *{visibility:visible!important}
+      body.printing-dashboard #dashboardModal{position:absolute!important;inset:0!important;background:#fff!important;padding:0!important;display:block!important}
+      body.printing-dashboard .dashboard-modal{width:100%!important;max-height:none!important;box-shadow:none!important;border-radius:0!important}
+      body.printing-dashboard .dashboard-body{overflow:visible!important;background:#fff!important}
+      body.printing-dashboard .dashboard-actions,
+      body.printing-dashboard #dashboardCloseBtn{display:none!important}
+      body.printing-dashboard .dash-table-wrap{max-height:none!important;overflow:visible!important}
+      body.printing-dashboard .dashboard-grid{display:block!important}
+      body.printing-dashboard .dashboard-card{page-break-inside:avoid;margin-bottom:16px!important}
+      body.printing-system-report *{visibility:hidden!important}
+      body.printing-system-report #systemReportModal,
+      body.printing-system-report #systemReportModal *{visibility:visible!important}
+      body.printing-system-report #systemReportModal{position:absolute!important;inset:0!important;background:#fff!important;padding:0!important;display:block!important}
+      body.printing-system-report .system-report-modal{width:100%!important;max-height:none!important;box-shadow:none!important;border-radius:0!important}
+      body.printing-system-report .system-report-body{overflow:visible!important;background:#fff!important;padding:8px!important}
+      body.printing-system-report .dashboard-actions,
+      body.printing-system-report #systemReportCloseBtn{display:none!important}
+      body.printing-system-report .system-report-table-wrap{overflow:visible!important}
+      body.printing-system-report .system-report-month{page-break-inside:avoid;box-shadow:none!important}
+      body.printing-system-report .system-report-month-head{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      body.printing-system-report .system-report-status{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    }
+    .modal-backdrop{position:fixed;inset:0;z-index:200;background:rgba(29,18,45,.58);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:20px}
+    .modal{width:min(1180px,96vw);max-height:92vh;background:#fff;border-radius:22px;box-shadow:0 24px 80px rgba(21,12,34,.35);display:flex;flex-direction:column;overflow:hidden}
+    .modal-head{padding:20px 22px;border-bottom:1px solid #ebe5f2;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .modal-head h3{margin:0;font-size:22px}.modal-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+    .icon-btn{width:38px;height:38px;border:0;border-radius:10px;background:#f3f0f8;color:#5e5470;cursor:pointer;font-size:20px}
+    .modal-body{padding:20px 22px;overflow:auto}
+    .mode-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:5px;background:#f4f0fa;border-radius:14px;margin-bottom:20px}
+    .mode-btn{border:0;border-radius:10px;background:transparent;padding:11px 12px;font-weight:800;color:#6d627b;cursor:pointer}
+    .mode-btn.active{background:#fff;color:var(--violet);box-shadow:0 4px 14px rgba(47,27,68,.08)}
+    .form-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr;gap:12px}
+    .form-grid .field{margin:0}
+    .block-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;flex-wrap:wrap}
+    .block-actions .btn{min-width:150px}
+    .selection-wrap{margin-top:20px;border:1px solid #e8e1ef;border-radius:16px;overflow:hidden}
+    .selection-toolbar{padding:12px 14px;background:#faf8fd;border-bottom:1px solid #e8e1ef;display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .selection-toolbar span{font-size:13px;color:var(--muted)}
+    .selection-scroll{overflow:auto;max-height:50vh}
+    .selection-table{border-collapse:separate;border-spacing:0;min-width:max-content;width:100%}
+    .selection-table th,.selection-table td{border-right:1px solid #e5dfea;border-bottom:1px solid #e5dfea;height:38px;min-width:42px;text-align:center;font-size:10px;padding:0}
+    .selection-table th{position:sticky;top:0;background:#f7f3fc;z-index:3}
+    .selection-table .room{position:sticky;left:0;z-index:4;background:#fff;min-width:230px;max-width:230px;text-align:left;padding:0 10px;font-size:11px;font-weight:800}
+    .selection-table thead .room{background:#5b21b6;color:#fff;z-index:6}
+    .pickcell{cursor:pointer;position:relative}
+    .pickcell input{width:17px;height:17px;accent-color:#6d28d9}
+    .pickcell.unavailable{background:#f1eef4;color:#9c95a5;cursor:not-allowed}
+    .pickcell.unavailable input{display:none}
+    .pickcell.selected{background:#ede9fe}
+    .pick-status{font-size:8px;line-height:1.1;display:block;max-width:40px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .block-select-card{background:#faf8fd;border:1px solid #e8e1ef;border-radius:14px;padding:14px;margin-bottom:16px}
+    .block-select-card select{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff}
+    #existingBlockSelect option[value=""]{background:#ffffff;color:#111827;font-weight:500}
+    #existingBlockSelect option{padding:8px}
+    .block-summary{margin-top:12px;padding:12px 14px;border-radius:12px;background:#fff;border:1px solid #ece6f1;font-size:13px;color:#5f566c;line-height:1.55}
+    .danger-zone{border:1px solid #fecaca;background:#fff7f7;border-radius:14px;padding:16px}
+    .danger-zone strong{color:#991b1b}
+    .report-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;padding:14px 16px;background:#faf8fd;border:1px solid #e8e1ef;border-radius:14px}
+    .report-head strong{font-size:17px;color:#3b2d4c}.report-head p{margin:4px 0 0;color:#766c82;font-size:12px}
+    .report-wrap{border:1px solid #e8e1ef;border-radius:14px;overflow:auto;max-height:55vh;background:#fff}
+    .report-table{width:100%;border-collapse:collapse;min-width:980px}
+    .report-table th{position:sticky;top:0;z-index:2;background:#5b21b6;color:#fff;font-size:10px;text-transform:uppercase;letter-spacing:.03em;padding:10px 9px;text-align:left}
+    .report-table td{padding:10px 9px;border-bottom:1px solid #eee8f3;font-size:11px;vertical-align:top;color:#4f465a}
+    .report-table tr:hover td{background:#faf8fd}
+    .report-status{display:inline-block;padding:4px 8px;border-radius:999px;font-size:9px;font-weight:900}
+    .report-status.tentative{background:#fef3c7;color:#92400e}.report-status.guaranteed{background:#fee2e2;color:#991b1b}.report-status.out_of_service{background:#111827;color:#fff}
+    .report-empty{padding:42px 18px;text-align:center;color:#7b7187}.report-empty strong{display:block;color:#473752;font-size:16px;margin-bottom:5px}
+    .status-lock-hint{margin-top:7px;padding:9px 10px;border-radius:9px;background:#f4f0f8;color:#5b5167;font-size:11px;font-weight:700;line-height:1.35}
+    .warning-backdrop{position:fixed;inset:0;z-index:320;background:rgba(30,18,43,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px}
+    .warning-card{width:min(410px,92vw);background:#fff;border-radius:22px;padding:26px 24px 24px;text-align:center;box-shadow:0 24px 75px rgba(30,18,43,.32);border:1px solid #eadff6}
+    .email-card{width:min(440px,94vw);background:#fff;border-radius:22px;padding:24px;box-shadow:0 24px 75px rgba(30,18,43,.32);border:1px solid #eadff6}
+    .email-card h3{margin:0 0 7px;font-size:22px;color:#38264b}.email-card p{margin:0 0 18px;color:#6f6678;font-size:13px;line-height:1.5}.email-card .field{margin-bottom:18px}.email-card-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}.email-card-actions .btn{width:auto;min-width:110px}
+    .warning-card h3{margin:8px 0 8px;font-size:22px;color:#38264b}
+    .warning-card p{margin:0 auto 20px;max-width:340px;color:#5f5668;line-height:1.55;font-size:14px}
+    .license-warning-card{width:min(430px,92vw);background:#fff;border-radius:22px;padding:28px 25px 24px;text-align:center;box-shadow:0 24px 75px rgba(30,18,43,.34);border:1px solid #eadff6}
+    .license-warning-card h3{margin:10px 0 8px;font-size:22px;color:#38264b}
+    .license-warning-card p{margin:0 auto 20px;max-width:355px;color:#5f5668;line-height:1.55;font-size:14px;font-weight:700}
+    .license-hand{font-size:64px;line-height:1;display:inline-block;transform-origin:70% 80%;animation:licenseWave .72s ease-in-out infinite alternate}
+    @keyframes licenseWave{0%{transform:rotate(-18deg) translateY(2px)}100%{transform:rotate(20deg) translateY(-5px)}}
+    .warning-icon{width:68px;height:68px;margin:0 auto;border-radius:50%;display:grid;place-items:center;background:#fff3cd;color:#9a6700;border:3px solid #f4c542;font-size:45px;font-weight:900;line-height:1;animation:warningBounce .75s ease-in-out infinite alternate}
+    @keyframes warningBounce{0%{transform:translateY(0) rotate(-5deg)}100%{transform:translateY(-10px) rotate(5deg)}}
+    #blockStatus:disabled{background:#f1eef4;color:#665c70;cursor:not-allowed;opacity:1}
+    .deadline-field small{display:block;margin-top:6px;color:#766c82;font-size:10px;line-height:1.35}
+    .edit-locked-note{margin:12px 0;padding:12px 14px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:12px;font-weight:700;line-height:1.45}
+    .modal input:disabled,.modal select:disabled{background:#f1eef4!important;color:#665c70!important;cursor:not-allowed;opacity:1}
+
+    .toast-wrap{position:fixed;top:18px;right:18px;z-index:1000;display:grid;gap:8px}.toast{min-width:280px;max-width:420px;padding:13px 15px;border-radius:12px;background:#241b35;color:#fff;box-shadow:0 14px 38px rgba(0,0,0,.2);font-size:13px;animation:in .2s ease}.toast.ok{background:#166534}.toast.err{background:#991b1b}@keyframes in{from{transform:translateY(-8px);opacity:0}to{transform:none;opacity:1}}
+    .overlay{position:fixed;inset:0;display:grid;place-items:center;background:rgba(32,19,51,.28);backdrop-filter:blur(3px);z-index:999}.spinner{width:52px;height:52px;border:5px solid rgba(255,255,255,.55);border-top-color:#6d28d9;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+
+    @media(max-width:900px){.form-grid{grid-template-columns:1fr 1fr}.mode-tabs{grid-template-columns:1fr 1fr}.selection-table .room{min-width:180px;max-width:180px}.auth-wrap{grid-template-columns:1fr}.brand-panel{display:none}.auth-panel{min-height:100vh;padding:22px}.main{padding:18px}.hero{align-items:stretch;flex-direction:column}.toolbar{width:100%}.toolbar .field{flex:1}.stats{grid-template-columns:repeat(2,1fr)}.usertext{display:none}.chart-scroll{max-height:calc(100vh - 355px)}}
+    @media(max-width:520px){.form-grid{grid-template-columns:1fr}.modal-backdrop{padding:8px}.modal{max-height:96vh;border-radius:16px}.auth-card{padding:24px 18px;border-radius:20px}.topbar{padding:11px 13px}.main{padding:14px}.hero h2{font-size:24px}.stats{gap:8px}.stat{padding:11px}.stat strong{font-size:20px}.chart .salon-col{min-width:175px;max-width:175px}.btn-ghost span{display:none}}
+
+    /* CUENTA / USUARIOS */
+    .btn-account{background:#f3e8f1;color:#7d2456;border:1px solid #ead0df}
+    .account-modal{width:min(1180px,97vw);max-height:95vh}
+    .account-body{padding:22px;overflow:auto;background:linear-gradient(180deg,#fffafd,#f9f7fb)}
+    .account-title{font-family:Georgia,serif;color:#7d2456;font-size:30px;margin:0 0 4px}
+    .account-sub{margin:0 0 20px;color:#806b78}
+    .account-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .account-card{background:#fff;border:1px solid #ead8e2;border-radius:18px;padding:20px;box-shadow:0 8px 24px rgba(76,29,149,.06)}
+    .account-profile{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px}
+    .account-avatar{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#b83280,#7d2456);color:#fff;font-family:Georgia,serif;font-size:26px;font-weight:800;box-shadow:0 12px 28px rgba(125,36,86,.2);margin-bottom:14px}
+    .account-profile h4{font-size:24px;color:#6f234f;margin:0 0 10px}.account-profile p{margin:3px 0;color:#4b3845}.role-badge{display:inline-block;margin-top:7px;padding:5px 10px;border-radius:999px;background:#f7e7f0;color:#7d2456;font-size:11px;font-weight:900;text-transform:uppercase}
+    .account-card h4{margin:0 0 16px;color:#7d2456;font-size:17px}.account-card .field{margin-bottom:14px}
+    .account-actions{display:flex;gap:10px;justify-content:flex-start;flex-wrap:wrap;margin-top:8px}.account-actions .btn{width:auto}
+    .users-section{margin-top:20px}.users-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.users-head h4{font-family:Georgia,serif;color:#7d2456;font-size:27px;margin:0}.users-head p{margin:3px 0 0;color:#806b78;font-size:13px}
+    .users-table-wrap{background:#fff;border:1px solid #ead8e2;border-radius:18px;padding:14px;overflow:auto}.users-table{width:100%;border-collapse:collapse;min-width:760px}.users-table th{background:#f8e9f2;color:#7d2456;text-transform:uppercase;font-size:10px;letter-spacing:.04em;text-align:left;padding:11px}.users-table td{padding:12px 11px;border-bottom:1px solid #f0e3ea;font-size:12px}.users-table tr:last-child td{border-bottom:0}.user-current{font-size:9px;color:#8b5cf6;font-weight:900;display:block;margin-top:2px}.btn-user-add{background:linear-gradient(135deg,#b83280,#7d2456);color:#fff}.btn-user-delete{background:#fff1f2;color:#be123c;border:1px solid #fecdd3;padding:8px 11px}
+    .operator-note{padding:14px;border-radius:12px;background:#f8f5fa;color:#64576b;font-size:12px;margin-top:16px;border:1px solid #e9e1ee}
+    .add-user-card{width:min(500px,94vw);background:#fff;border-radius:22px;padding:24px;box-shadow:0 24px 75px rgba(30,18,43,.32);border:1px solid #eadff6}.add-user-card h3{margin:0 0 6px;color:#7d2456}.add-user-card p{margin:0 0 18px;color:#786b75;font-size:13px}.add-user-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}.add-user-actions .btn{width:auto}
+    @media(max-width:850px){.account-grid{grid-template-columns:1fr}.account-profile{min-height:230px}.users-head{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- AUTH VIEW -->
+  <section id="authView" class="auth-wrap">
+    <aside class="brand-panel">
+      <div class="brand-inner">
+        <div class="logo-lockup">
+          <div class="logo-mark">GD</div>
+          <div class="logo-text"><strong>GRUPO DORADOS</strong><span>EVENTOS & HOSPITALIDAD</span></div>
+        </div>
+        <h1>Disponibilidad de salones, clara y al instante.</h1>
+        <p>Consulta por mes el estado de cada espacio, identifica eventos tentativos y garantizados y trabaja con una sola fuente de información.</p>
+        <div class="brand-tags"><span class="brand-tag">Seguro</span><span class="brand-tag">Responsive</span><span class="brand-tag">Google Sheets</span></div>
+        <div class="hotel-motion" aria-label="Hoteles y centro de convenciones">
+          <div class="hotel-motion-card" title="Hotel"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M13 53V18h28v35M41 29h10v24M9 53h46M20 25h5M31 25h5M20 34h5M31 34h5M20 43h5M31 43h5"/></svg></div>
+          <div class="hotel-motion-card" title="Habitación"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 47V29h8c5 0 8 3 8 8h27v10M10 53V23M53 53V35M10 42h43M20 29v-8h13c6 0 10 4 10 10v6"/></svg></div>
+          <div class="hotel-motion-card" title="Centro de convenciones"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 52h48M13 52V27l19-12 19 12v25M20 32h24M20 40h24M24 52V40M40 52V40"/><path d="M28 25h8"/></svg></div>
+          <div class="hotel-motion-card" title="Eventos"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="25" r="12"/><path d="M32 37v16M24 53h16M26 25h12M32 19v12"/></svg></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="auth-panel">
+      <div class="auth-card">
+        <div id="normalAuth">
+          <h2 id="authTitle">Bienvenido</h2>
+          <p class="subtitle" id="authSubtitle">Inicia sesión para consultar la disponibilidad.</p>
+          <div class="tabs" style="grid-template-columns:1fr">
+            <button class="tab active" id="tabLogin" type="button">Iniciar sesión</button>
+          </div>
+
+          <form id="loginForm" onsubmit="login(event)">
+            <div class="field"><label>Correo electrónico</label><input id="loginEmail" type="email" autocomplete="email" required placeholder="correo@ejemplo.com"></div>
+            <div class="field"><label>Contraseña</label><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="••••••••"></div>
+            <button class="btn btn-primary" type="submit">Entrar al chart</button>
+            <div class="auth-links"><span></span><button class="link-btn" type="button" onclick="showRecovery()">¿Olvidaste tu contraseña?</button></div>
+          </form>
+
+          <form id="registerForm" class="hidden" onsubmit="register(event)">
+            <div class="field"><label>Nombre</label><input id="regName" type="text" required maxlength="120" placeholder="Nombre completo"></div>
+            <div class="field"><label>Correo electrónico</label><input id="regEmail" type="email" autocomplete="email" required placeholder="correo@ejemplo.com"></div>
+            <div class="field"><label>Contraseña</label><input id="regPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Mínimo 8 caracteres"></div>
+            <button class="btn btn-primary" type="submit">Crear cuenta</button>
+            <p class="fine">La contraseña se almacena con hash SHA-256 y salt; no se guarda en texto visible.</p>
+          </form>
+        </div>
+
+        <div id="recoveryView" class="hidden">
+          <h2>Recuperar contraseña</h2>
+          <p class="subtitle">Te enviaremos un enlace temporal por correo.</p>
+          <form onsubmit="recover(event)">
+            <div class="field"><label>Correo electrónico</label><input id="recoverEmail" type="email" required placeholder="correo@ejemplo.com"></div>
+            <button class="btn btn-primary" type="submit">Enviar enlace</button>
+            <div class="auth-links"><button class="link-btn" type="button" onclick="hideRecovery()">← Volver</button></div>
+          </form>
+        </div>
+
+        <div id="resetView" class="hidden">
+          <h2>Nueva contraseña</h2>
+          <p class="subtitle">Crea una contraseña nueva para tu cuenta.</p>
+          <form onsubmit="submitReset(event)">
+            <div class="field"><label>Nueva contraseña</label><input id="newPassword" type="password" minlength="8" required placeholder="Mínimo 8 caracteres"></div>
+            <div class="field"><label>Confirmar contraseña</label><input id="newPassword2" type="password" minlength="8" required placeholder="Repite la contraseña"></div>
+            <button class="btn btn-primary" type="submit">Actualizar contraseña</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- APP VIEW -->
+  <section id="appView" class="hidden">
+    <header class="topbar">
+      <div class="mini-brand">
+        <div class="mini-logo">GD</div>
+        <div class="mini-title"><strong>GRUPO DORADOS</strong><span>Disponibilidad de Salones</span></div>
+      </div>
+      <div class="userbox">
+        <div class="usertext"><strong id="userName">Usuario</strong><span id="userEmail"></span></div>
+        <div class="avatar" id="avatar">U</div>
+        <button class="btn btn-account" onclick="openAccount()">👤 Cuenta</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="hero">
+        <div>
+          <h2 id="monthTitle">Disponibilidad</h2>
+          <p id="sheetHint">Selecciona el mes y el año.</p>
+        </div>
+        <div class="toolbar">
+          <div class="field"><label>MES</label><select id="monthSelect" onchange="loadAvailability()"></select></div>
+          <div class="field"><label>AÑO</label><select id="yearSelect" onchange="loadAvailability()"></select></div>
+          <button id="myBlocksButton" class="btn btn-block" onclick="openBlockModal()">▣ Mis Bloqueos</button>
+          <button id="serviceButton" class="btn btn-service hidden" onclick="openServiceModal()">⚫ Fuera de Servicio</button>
+          <button class="btn btn-dashboard" onclick="openDashboard()">▥ Dashboard</button>
+          <button class="btn btn-report-main" onclick="openSystemReport()">▤ Reporte</button>
+          <button class="btn btn-ghost" onclick="loadAvailability()">↻ <span>Actualizar</span></button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat av"><span>Disponibles</span><strong id="stAvailable">0</strong></div>
+        <div class="stat oc"><span>Fecha límite alcanzada</span><strong id="stOccupied">0</strong></div>
+        <div class="stat te"><span>Tentativos</span><strong id="stTentative">0</strong></div>
+        <div class="stat ga"><span>Garantizados</span><strong id="stGuaranteed">0</strong></div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="swatch available"></span>Disponible</div>
+        <div class="legend-item"><span class="swatch occupied"></span>Fecha limite alcanzada</div>
+        <div class="legend-item"><span class="swatch tentative"></span>Tentativo</div>
+        <div class="legend-item"><span class="swatch guaranteed"></span>Garantizado</div>
+        <div class="legend-item"><span class="swatch out_of_service"></span>Fuera de servicio</div>
+      </div>
+
+      <section class="chart-card">
+        <div id="chartContainer" class="chart-scroll"></div>
+      </section>
+    </main>
+  </section>
+</div>
+
+
+<div id="blockModal" class="modal-backdrop hidden" onclick="modalBackdropClick(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="blockModalTitle">
+    <div class="modal-head">
+      <div>
+        <h3 id="blockModalTitle">Gestión de bloqueos</h3>
+        <p>Administra tus bloqueos y consulta el reporte de cancelados del mes seleccionado.</p>
+      </div>
+      <button class="icon-btn" type="button" onclick="closeBlockModal()" aria-label="Cerrar">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mode-tabs">
+        <button id="modeNewBtn" class="mode-btn active" type="button" onclick="setBlockMode('new')">＋ Nuevo bloqueo</button>
+        <button id="modeEditBtn" class="mode-btn" type="button" onclick="setBlockMode('edit')">✎ Modificar bloqueo</button>
+        <button id="modeCancelBtn" class="mode-btn" type="button" onclick="setBlockMode('cancel')">⊘ Cancelar bloqueo</button>
+        <button id="modeReportBtn" class="mode-btn" type="button" onclick="setBlockMode('report')">▤ Reporte de cancelados</button>
+      </div>
+
+      <div id="blockPicker" class="block-select-card hidden">
+        <label id="blockPickerLabel" style="display:block;font-size:12px;font-weight:800;margin-bottom:7px">SELECCIONA UN BLOQUEO</label>
+        <select id="existingBlockSelect" onchange="existingBlockChanged()"></select>
+        <div id="existingBlockSummary" class="block-summary hidden"></div>
+      </div>
+
+      <div id="blockEditor">
+        <div class="form-grid">
+          <div class="field">
+            <label>NOMBRE DEL EVENTO</label>
+            <input id="blockEvent" type="text" maxlength="160" placeholder="Ej. Congreso anual">
+          </div>
+
+          <div class="field">
+            <label>FECHA DE ENTRADA</label>
+            <input id="blockStart" type="date" onchange="blockDatesChanged()">
+          </div>
+
+          <div class="field">
+            <label>FECHA DE SALIDA</label>
+            <input id="blockEnd" type="date" onchange="blockDatesChanged()">
+          </div>
+
+          <div class="field">
+            <label>STATUS DEL BLOQUEO</label>
+            <select id="blockStatus" onchange="blockStatusChanged()">
+              <option value="tentative">TENTATIVO</option>
+              <option value="guaranteed">GARANTIZADO</option>
+            </select>
+            <div id="statusLockHint" class="status-lock-hint hidden">
+              🔒 Este bloqueo ya es GARANTIZADO. El status no puede volver a TENTATIVO.
+            </div>
+          </div>
+
+          <div id="deadlineField" class="field deadline-field">
+            <label>FECHA LÍMITE DEL BLOQUEO</label>
+            <input id="blockDeadline" type="date" onchange="deadlineChanged()">
+            <small>Al finalizar este día, el bloqueo TENTATIVO se cancela automáticamente a las 23:59 hrs.</small>
+          </div>
+        </div>
+
+        <div id="editLockedNote" class="edit-locked-note hidden">
+          🔒 Este bloqueo GARANTIZADO ya no puede modificarse porque su fecha de salida es mañana o anterior.
+        </div>
+
+        <div class="block-actions">
+          <button id="selectDatesBtn" class="btn btn-block" type="button" onclick="buildSelectionGrid()">Seleccionar salones y fechas</button>
+        </div>
+
+        <div id="selectionWrap" class="selection-wrap hidden">
+          <div class="selection-toolbar">
+            <strong>Selección por salón y fecha</strong>
+            <span>Marca únicamente los días que deseas bloquear.</span>
+          </div>
+          <div id="selectionGrid" class="selection-scroll"></div>
+        </div>
+
+        <div class="block-actions">
+          <button id="saveBlockBtn" class="btn btn-primary" style="width:auto" type="button" onclick="submitBlock()">Guardar nuevo bloqueo</button>
+        </div>
+      </div>
+
+      <div id="cancelPanel" class="hidden danger-zone">
+        <strong>Cancelar bloqueo</strong>
+        <p id="cancelText" style="margin:8px 0 14px;color:#6f6678">
+          Selecciona arriba el bloqueo que deseas cancelar.
+        </p>
+        <button class="btn btn-danger" type="button" onclick="submitCancelBlock()">
+          Cancelar bloqueo seleccionado
+        </button>
+      </div>
+
+      <div id="cancelledReportPanel" class="hidden">
+        <div class="report-head">
+          <div>
+            <strong id="cancelledReportTitle">Reporte de cancelados</strong>
+            <p id="cancelledReportSubtitle">Bloqueos cancelados del mes seleccionado.</p>
+          </div>
+          <button class="btn btn-ghost" type="button" onclick="loadCancelledReport()">↻ Actualizar reporte</button>
+        </div>
+        <div id="cancelledReportContent" class="report-wrap"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="dashboardModal" class="modal-backdrop hidden" onclick="dashboardBackdropClick(event)">
+  <div class="modal dashboard-modal" role="dialog" aria-modal="true" aria-labelledby="dashboardTitle">
+    <div class="modal-head">
+      <div>
+        <h3 id="dashboardTitle">Dashboard de Bloqueos</h3>
+        <p id="dashboardGenerated">Información completa de bloqueos por usuario.</p>
+      </div>
+      <div class="dashboard-actions">
+        <button class="btn btn-ghost" type="button" onclick="printDashboard()">🖨 Imprimir</button>
+        <button class="btn btn-ghost" type="button" onclick="emailDashboard()">✉ Enviar por Email</button>
+        <button class="btn btn-ghost" type="button" onclick="whatsappDashboard()">◉ Enviar por WhatsApp</button>
+        <button id="dashboardCloseBtn" class="icon-btn" type="button" onclick="closeDashboard()" aria-label="Cerrar">×</button>
+      </div>
+    </div>
+    <div id="dashboardBody" class="dashboard-body">
+      <div class="dashboard-loading"><strong>Cargando dashboard...</strong>Calculando indicadores y gráficas.</div>
+    </div>
+  </div>
+</div>
+
+<div id="systemReportModal" class="modal-backdrop hidden" onclick="systemReportBackdropClick(event)">
+  <div class="modal system-report-modal" role="dialog" aria-modal="true" aria-labelledby="systemReportTitle">
+    <div class="modal-head">
+      <div>
+        <h3 id="systemReportTitle">Reporte General de Bloqueos</h3>
+        <p id="systemReportGenerated">Bloqueos TENTATIVOS y GARANTIZADOS de todos los usuarios, separados por mes.</p>
+      </div>
+      <div class="dashboard-actions">
+        <button class="btn btn-ghost" type="button" onclick="printSystemReport()">🖨 Imprimir</button>
+        <button class="btn btn-ghost" type="button" onclick="openSystemReport()">↻ Actualizar</button>
+        <button id="systemReportCloseBtn" class="icon-btn" type="button" onclick="closeSystemReport()" aria-label="Cerrar">×</button>
+      </div>
+    </div>
+    <div id="systemReportBody" class="system-report-body">
+      <div class="system-report-empty"><strong>Cargando reporte...</strong>Consultando todos los bloqueos activos del sistema.</div>
+    </div>
+  </div>
+</div>
+
+<div id="emailDashboardModal" class="warning-backdrop hidden" onclick="emailDashboardBackdropClick(event)">
+  <div class="email-card" role="dialog" aria-modal="true" aria-labelledby="emailDashboardTitle">
+    <h3 id="emailDashboardTitle">Enviar dashboard por Email</h3>
+    <p>Captura el correo electrónico al que deseas enviar el resumen del dashboard.</p>
+    <form onsubmit="submitDashboardEmail(event)">
+      <div class="field">
+        <label>CORREO ELECTRÓNICO</label>
+        <input id="dashboardEmailTo" type="email" autocomplete="email" required placeholder="correo@ejemplo.com">
+      </div>
+      <div class="email-card-actions">
+        <button class="btn btn-ghost" type="button" onclick="closeEmailDashboardModal()">Cancelar</button>
+        <button id="sendDashboardEmailBtn" class="btn btn-primary" style="width:auto" type="submit">✉ Enviar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<div id="accountModal" class="modal-backdrop hidden" onclick="accountBackdropClick(event)">
+  <div class="modal account-modal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+    <div class="modal-head">
+      <div>
+        <h3 id="accountTitle">Mi cuenta</h3>
+        <p>Perfil, contraseña y administración de usuarios.</p>
+      </div>
+      <button class="icon-btn" type="button" onclick="closeAccount()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="account-body">
+      <h2 class="account-title">Mi cuenta</h2>
+      <p class="account-sub">Gestiona tu perfil y las opciones disponibles según tu tipo de usuario.</p>
+
+      <div class="account-grid">
+        <section class="account-card account-profile">
+          <div id="accountAvatar" class="account-avatar">U</div>
+          <h4 id="accountName">Usuario</h4>
+          <p id="accountEmail"></p>
+          <span id="accountRole" class="role-badge">Operador</span>
+          <div class="account-actions" style="justify-content:center;margin-top:24px">
+            <button class="btn btn-danger" type="button" onclick="logout()">🚪 Cerrar sesión</button>
+          </div>
+        </section>
+
+        <section class="account-card">
+          <h4>🔐 Actualizar mi contraseña</h4>
+          <form onsubmit="changeMyPassword(event)">
+            <div class="field"><label>CONTRASEÑA ACTUAL</label><input id="accountCurrentPassword" type="password" autocomplete="current-password" required></div>
+            <div class="field"><label>NUEVA CONTRASEÑA</label><input id="accountNewPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Mínimo 8 caracteres y un número"></div>
+            <div class="field"><label>CONFIRMAR NUEVA CONTRASEÑA</label><input id="accountConfirmPassword" type="password" autocomplete="new-password" minlength="8" required></div>
+            <button class="btn btn-user-add" type="submit">Actualizar contraseña</button>
+          </form>
+        </section>
+      </div>
+
+      <section id="adminUsersSection" class="users-section hidden">
+        <div class="users-head">
+          <div><h4>Administración de usuarios</h4><p>Disponible únicamente para usuarios Administrador.</p></div>
+          <button class="btn btn-user-add" type="button" onclick="openAddUser()">＋ Agregar usuario</button>
+        </div>
+        <div class="users-table-wrap">
+          <table class="users-table">
+            <thead><tr><th>Nombre</th><th>Email</th><th>Tipo</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="usersTableBody"><tr><td colspan="5">Cargando usuarios...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+      <div id="operatorAccountNote" class="operator-note hidden">Tu cuenta es de tipo Operador. Puedes modificar tu propia contraseña y cerrar sesión. La administración de usuarios está reservada para Administradores.</div>
+    </div>
+  </div>
+</div>
+
+<div id="addUserModal" class="warning-backdrop hidden" onclick="addUserBackdropClick(event)">
+  <div class="add-user-card" role="dialog" aria-modal="true" aria-labelledby="addUserTitle">
+    <h3 id="addUserTitle">Agregar usuario</h3>
+    <p>Crea una cuenta nueva y asigna su tipo de acceso.</p>
+    <form onsubmit="submitAddUser(event)">
+      <div class="field"><label>NOMBRE</label><input id="newUserName" type="text" maxlength="120" required></div>
+      <div class="field"><label>EMAIL</label><input id="newUserEmail" type="email" required></div>
+      <div class="field"><label>CONTRASEÑA INICIAL</label><input id="newUserPassword" type="password" minlength="8" required placeholder="Mínimo 8 caracteres y un número"></div>
+      <div class="field"><label>TIPO DE USUARIO</label><select id="newUserType" required><option value="operador">Operador</option><option value="consulta">Consulta (sin Mis Bloqueos)</option><option value="administrador">Administrador</option></select></div>
+      <div class="add-user-actions"><button class="btn btn-ghost" type="button" onclick="closeAddUser()">Cancelar</button><button class="btn btn-user-add" type="submit">Agregar usuario</button></div>
+    </form>
+  </div>
+</div>
+
+
+<div id="serviceModal" class="modal-backdrop hidden" onclick="serviceBackdropClick(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="serviceModalTitle">
+    <div class="modal-head">
+      <div>
+        <h3 id="serviceModalTitle">Fuera de Servicio</h3>
+        <p>Gestiona salones fuera de servicio. Esta opción es exclusiva para Administradores.</p>
+      </div>
+      <button class="icon-btn" type="button" onclick="closeServiceModal()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="mode-tabs">
+        <button id="svcModeNewBtn" class="mode-btn active" type="button" onclick="setServiceMode('new')">＋ Nuevo bloqueo</button>
+        <button id="svcModeEditBtn" class="mode-btn" type="button" onclick="setServiceMode('edit')">✎ Modificar bloqueo</button>
+        <button id="svcModeCancelBtn" class="mode-btn" type="button" onclick="setServiceMode('cancel')">⊘ Cancelar bloqueo</button>
+        <button id="svcModeReportBtn" class="mode-btn" type="button" onclick="setServiceMode('report')">▤ Reporte de cancelados</button>
+      </div>
+
+      <div id="svcPicker" class="block-select-card hidden">
+        <label id="svcPickerLabel" style="display:block;font-size:12px;font-weight:800;margin-bottom:7px">SELECCIONA UN FUERA DE SERVICIO</label>
+        <select id="svcExistingSelect" onchange="serviceExistingChanged()"></select>
+        <div id="svcExistingSummary" class="block-summary hidden"></div>
+      </div>
+
+      <div id="svcEditor">
+        <div class="form-grid">
+          <div class="field"><label>NOMBRE / MOTIVO</label><input id="svcEvent" type="text" maxlength="160" placeholder="Ej. Mantenimiento preventivo"></div>
+          <div class="field"><label>FECHA DE ENTRADA</label><input id="svcStart" type="date" onchange="serviceDatesChanged()"></div>
+          <div class="field"><label>FECHA DE SALIDA</label><input id="svcEnd" type="date" onchange="serviceDatesChanged()"></div>
+          <div class="field"><label>STATUS DEL BLOQUEO</label><select id="svcStatus" disabled><option value="out_of_service">FUERA DE SERVICIO</option></select></div>
+          <div class="field"><label>FECHA LÍMITE</label><input type="text" value="No aplica" disabled></div>
+        </div>
+        <div class="block-actions"><button id="svcSelectDatesBtn" class="btn btn-service" type="button" onclick="buildServiceGrid()">Seleccionar salones y fechas</button></div>
+        <div id="svcSelectionWrap" class="selection-wrap hidden">
+          <div class="selection-toolbar"><strong>Selección por salón y fecha</strong><span>Marca únicamente los días que estarán fuera de servicio.</span></div>
+          <div id="svcSelectionGrid" class="selection-scroll"></div>
+        </div>
+        <div class="block-actions"><button id="svcSaveBtn" class="btn btn-service" type="button" onclick="submitServiceBlock()">Guardar fuera de servicio</button></div>
+      </div>
+
+      <div id="svcCancelPanel" class="hidden danger-zone">
+        <strong>Cancelar fuera de servicio</strong>
+        <p id="svcCancelText" style="margin:8px 0 14px;color:#6f6678">Selecciona arriba el registro que deseas cancelar.</p>
+        <button class="btn btn-danger" type="button" onclick="submitCancelServiceBlock()">Cancelar fuera de servicio seleccionado</button>
+      </div>
+
+      <div id="svcReportPanel" class="hidden">
+        <div class="report-head"><div><strong id="svcReportTitle">Reporte de cancelados</strong><p id="svcReportSubtitle">Fuera de servicio cancelados del mes seleccionado.</p></div><button class="btn btn-ghost" type="button" onclick="loadServiceCancelledReport()">↻ Actualizar reporte</button></div>
+        <div id="svcReportContent" class="report-wrap"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="licenseExpiredModal" class="warning-backdrop hidden" onclick="licenseExpiredBackdropClick(event)">
+  <div class="license-warning-card" role="alertdialog" aria-modal="true" aria-labelledby="licenseExpiredTitle">
+    <div class="license-hand" aria-hidden="true">👋</div>
+    <h3 id="licenseExpiredTitle">Licencia vencida</h3>
+    <p>Licencia vencida, ponganse en contacto con el administrador</p>
+    <button class="btn btn-primary" style="width:auto;min-width:120px" type="button" onclick="closeLicenseExpired()">Entendido</button>
+  </div>
+</div>
+
+<div id="guaranteeWarning" class="warning-backdrop hidden" onclick="guaranteeBackdropClick(event)">
+  <div class="warning-card" role="alertdialog" aria-modal="true" aria-labelledby="guaranteeWarningTitle">
+    <div class="warning-icon" aria-hidden="true">!</div>
+    <h3 id="guaranteeWarningTitle">Importante</h3>
+    <p>Un bloqueo GARANTIZADO es aquel que ya cuenta con una garantia y no puede regresarse a tentativo</p>
+    <button class="btn btn-primary" style="width:auto;min-width:120px" type="button" onclick="closeGuaranteeWarning()">Entendido</button>
+  </div>
+</div>
+
+<div id="overlay" class="overlay hidden"><div class="spinner"></div></div>
+<div id="toasts" class="toast-wrap"></div>
+
+<script>
+  const RESET_TOKEN = <?!= JSON.stringify(resetToken || '') ?>;
+  const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const SESSION_KEY = 'gd_session_token';
+  let currentUser = null;
+
+  document.addEventListener('DOMContentLoaded', init);
+
+  function init(){
+    fillMonths();
+    if (RESET_TOKEN){
+      document.getElementById('normalAuth').classList.add('hidden');
+      document.getElementById('resetView').classList.remove('hidden');
+      return;
+    }
+    const token = localStorage.getItem(SESSION_KEY);
+    if (token){
+      busy(true);
+      gas('validateSession', token).then(res => {
+        if (res.ok) enterApp(res.user);
+        else {
+          localStorage.removeItem(SESSION_KEY);
+          if (res && res.licenseExpired) showLicenseExpired();
+        }
+      }).catch(()=>localStorage.removeItem(SESSION_KEY)).finally(()=>busy(false));
+    }
+  }
+
+  function fillMonths(){
+    const sel = document.getElementById('monthSelect');
+    sel.innerHTML = MONTHS.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+    sel.value = new Date().getMonth()+1;
+  }
+
+  function switchAuth(mode){
+    const login = mode === 'login';
+    document.getElementById('loginForm').classList.toggle('hidden', !login);
+    document.getElementById('registerForm').classList.toggle('hidden', login);
+    const tabLogin=document.getElementById('tabLogin');
+    const tabRegister=document.getElementById('tabRegister');
+    if(tabLogin) tabLogin.classList.toggle('active', login);
+    if(tabRegister) tabRegister.classList.toggle('active', !login);
+    document.getElementById('authTitle').textContent = login ? 'Bienvenido' : 'Crear cuenta';
+    document.getElementById('authSubtitle').textContent = login ? 'Inicia sesión para consultar la disponibilidad.' : 'Registra un usuario para acceder al sistema.';
+  }
+
+  async function login(e){
+    e.preventDefault(); busy(true);
+    try{
+      const res = await gas('loginUser', {email:v('loginEmail'), password:v('loginPassword')});
+      if (!res.ok) {
+        if (res.licenseExpired) {
+          showLicenseExpired();
+          return;
+        }
+        return toast(res.message,'err');
+      }
+      localStorage.setItem(SESSION_KEY, res.token);
+      toast('Sesión iniciada.','ok');
+      enterApp(res.user);
+    }catch(err){toast(errorText(err),'err')} finally{busy(false)}
+  }
+
+  async function register(e){
+    e.preventDefault(); busy(true);
+    try{
+      const res = await gas('registerUser', {nombre:v('regName'), email:v('regEmail'), password:v('regPassword')});
+      if (!res.ok) return toast(res.message,'err');
+      localStorage.setItem(SESSION_KEY, res.token);
+      toast('Cuenta creada correctamente.','ok');
+      enterApp(res.user);
+    }catch(err){toast(errorText(err),'err')} finally{busy(false)}
+  }
+
+  function showRecovery(){document.getElementById('normalAuth').classList.add('hidden');document.getElementById('recoveryView').classList.remove('hidden')}
+  function hideRecovery(){document.getElementById('recoveryView').classList.add('hidden');document.getElementById('normalAuth').classList.remove('hidden')}
+
+  async function recover(e){
+    e.preventDefault(); busy(true);
+    try{
+      const res = await gas('requestPasswordReset', v('recoverEmail'));
+      toast(res.message || 'Solicitud procesada.', res.ok ? 'ok':'err');
+      if(res.ok) hideRecovery();
+    }catch(err){toast(errorText(err),'err')} finally{busy(false)}
+  }
+
+  async function submitReset(e){
+    e.preventDefault();
+    const p1=v('newPassword'), p2=v('newPassword2');
+    if(p1!==p2) return toast('Las contraseñas no coinciden.','err');
+    busy(true);
+    try{
+      const res=await gas('resetPassword',{token:RESET_TOKEN,password:p1});
+      if(!res.ok) return toast(res.message,'err');
+      toast(res.message,'ok');
+      setTimeout(()=>{ window.location.href = window.location.href.split('?')[0]; }, 900);
+    }catch(err){toast(errorText(err),'err')} finally{busy(false)}
+  }
+
+  async function enterApp(user){
+    currentUser=user;
+    document.getElementById('authView').classList.add('hidden');
+    document.getElementById('appView').classList.remove('hidden');
+    document.getElementById('userName').textContent=user.nombre || 'Usuario';
+    document.getElementById('userEmail').textContent=user.email || '';
+    document.getElementById('avatar').textContent=(user.nombre || 'U').trim().charAt(0).toUpperCase();
+    currentUser.tipo=(user.tipo || 'operador').toLowerCase();
+    document.getElementById('serviceButton').classList.toggle('hidden', currentUser.tipo!=='administrador');
+    const myBlocksButton=document.getElementById('myBlocksButton');
+    const blocksDisabled=currentUser.tipo==='consulta';
+    myBlocksButton.disabled=blocksDisabled;
+    myBlocksButton.title=blocksDisabled?'Esta opción no está disponible para usuarios Consulta.':'';
+    await loadYears();
+    await loadAvailability();
+  }
+
+
+  async function openAccount(){
+    document.getElementById('accountModal').classList.remove('hidden');
+    document.getElementById('usersTableBody').innerHTML='<tr><td colspan="5">Cargando usuarios...</td></tr>';
+    const token=localStorage.getItem(SESSION_KEY);
+    busy(true);
+    try{
+      const res=await gas('getAccountData',token);
+      if(!res.ok) throw new Error(res.message);
+      currentUser=res.user;
+      renderAccount(res);
+    }catch(err){
+      toast(errorText(err),'err');
+      closeAccount();
+    }finally{busy(false)}
+  }
+
+  function closeAccount(){
+    document.getElementById('accountModal').classList.add('hidden');
+    ['accountCurrentPassword','accountNewPassword','accountConfirmPassword'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  }
+
+  function accountBackdropClick(e){ if(e.target.id==='accountModal') closeAccount(); }
+
+  function renderAccount(data){
+    const user=data.user||{};
+    const userType=(user.tipo||'operador').toLowerCase();
+    const isAdmin=userType==='administrador';
+    const isConsulta=userType==='consulta';
+    document.getElementById('accountAvatar').textContent=(user.nombre||'U').trim().charAt(0).toUpperCase();
+    document.getElementById('accountName').textContent=user.nombre||'Usuario';
+    document.getElementById('accountEmail').textContent=user.email||'';
+    document.getElementById('accountRole').textContent=isAdmin?'Administrador':(isConsulta?'Consulta':'Operador');
+    document.getElementById('adminUsersSection').classList.toggle('hidden',!isAdmin);
+    const accountNote=document.getElementById('operatorAccountNote');
+    accountNote.classList.toggle('hidden',isAdmin);
+    if(!isAdmin){
+      accountNote.textContent=isConsulta
+        ? 'Tu cuenta es de tipo Consulta. Tiene las mismas funciones generales que un Operador, pero Mis Bloqueos está deshabilitado. Puedes modificar tu propia contraseña y cerrar sesión.'
+        : 'Tu cuenta es de tipo Operador. Puedes modificar tu propia contraseña y cerrar sesión. La administración de usuarios está reservada para Administradores.';
+    }
+    if(isAdmin) renderUsersTable(data.users||[]);
+  }
+
+  function renderUsersTable(users){
+    const body=document.getElementById('usersTableBody');
+    if(!users.length){body.innerHTML='<tr><td colspan="5">No hay usuarios registrados.</td></tr>';return;}
+    body.innerHTML=users.map(u=>{
+      const me=currentUser && String(u.id)===String(currentUser.id);
+      return `<tr>`+
+        `<td><strong>${escapeHtml(u.nombre||'')}</strong>${me?'<span class="user-current">USUARIO ACTUAL</span>':''}</td>`+
+        `<td>${escapeHtml(u.email||'')}</td>`+
+        `<td>${escapeHtml(capitalize(u.tipo||'operador'))}</td>`+
+        `<td>${escapeHtml(u.estado||'ACTIVO')}</td>`+
+        `<td>${me?'—':`<button class="btn btn-user-delete" type="button" onclick="deleteSystemUser('${escapeAttr(u.id)}','${escapeAttr(u.nombre||u.email)}')">🗑 Eliminar</button>`}</td>`+
+      `</tr>`;
+    }).join('');
+  }
+
+  async function changeMyPassword(e){
+    e.preventDefault();
+    const current=v('accountCurrentPassword'), next=v('accountNewPassword'), confirm=v('accountConfirmPassword');
+    if(next!==confirm) return toast('La confirmación de la nueva contraseña no coincide.','err');
+    const token=localStorage.getItem(SESSION_KEY);
+    busy(true);
+    try{
+      const res=await gas('changeOwnPassword',token,{currentPassword:current,newPassword:next});
+      if(!res.ok) return toast(res.message,'err');
+      toast(res.message,'ok');
+      localStorage.removeItem(SESSION_KEY);
+      setTimeout(()=>location.reload(),900);
+    }catch(err){toast(errorText(err),'err')}finally{busy(false)}
+  }
+
+  function openAddUser(){
+    if(!currentUser || currentUser.tipo!=='administrador') return toast('Esta opción es exclusiva para Administradores.','err');
+    document.getElementById('addUserModal').classList.remove('hidden');
+    setTimeout(()=>document.getElementById('newUserName').focus(),50);
+  }
+  function closeAddUser(){
+    document.getElementById('addUserModal').classList.add('hidden');
+    ['newUserName','newUserEmail','newUserPassword'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('newUserType').value='operador';
+  }
+  function addUserBackdropClick(e){if(e.target.id==='addUserModal')closeAddUser();}
+
+  async function submitAddUser(e){
+    e.preventDefault();
+    const token=localStorage.getItem(SESSION_KEY);
+    const payload={nombre:v('newUserName'),email:v('newUserEmail'),password:v('newUserPassword'),tipo:v('newUserType')};
+    busy(true);
+    try{
+      const res=await gas('adminCreateUser',token,payload);
+      if(!res.ok) return toast(res.message,'err');
+      toast(res.message,'ok');
+      closeAddUser();
+      const account=await gas('getAccountData',token);
+      if(account.ok){currentUser=account.user;renderAccount(account);}
+    }catch(err){toast(errorText(err),'err')}finally{busy(false)}
+  }
+
+  async function deleteSystemUser(userId,userName){
+    if(!currentUser || currentUser.tipo!=='administrador') return toast('Esta opción es exclusiva para Administradores.','err');
+    if(!confirm(`¿Eliminar al usuario ${userName}? Esta acción cerrará sus sesiones activas.`)) return;
+    const token=localStorage.getItem(SESSION_KEY);
+    busy(true);
+    try{
+      const res=await gas('adminDeleteUser',token,userId);
+      if(!res.ok) return toast(res.message,'err');
+      toast(res.message,'ok');
+      const account=await gas('getAccountData',token);
+      if(account.ok) renderAccount(account);
+    }catch(err){toast(errorText(err),'err')}finally{busy(false)}
+  }
+
+  async function logout(){
+    const token=localStorage.getItem(SESSION_KEY);
+    busy(true);
+    try{
+      // Primero cerramos la sesión también en el servidor.
+      if(token){
+        try{ await gas('logoutUser',token); }catch(_e){}
+      }
+    }finally{
+      // Siempre eliminamos la sesión local y regresamos al Login.
+      localStorage.removeItem(SESSION_KEY);
+      currentUser=null;
+
+      const accountModal=document.getElementById('accountModal');
+      if(accountModal) accountModal.classList.add('hidden');
+
+      document.getElementById('appView').classList.add('hidden');
+      document.getElementById('authView').classList.remove('hidden');
+
+      // Restaurar la vista normal de acceso.
+      const normalAuth=document.getElementById('normalAuth');
+      const recoveryView=document.getElementById('recoveryView');
+      const resetView=document.getElementById('resetView');
+      if(normalAuth) normalAuth.classList.remove('hidden');
+      if(recoveryView) recoveryView.classList.add('hidden');
+      if(resetView) resetView.classList.add('hidden');
+
+      switchAuth('login');
+      const loginForm=document.getElementById('loginForm');
+      if(loginForm) loginForm.reset();
+      const loginEmail=document.getElementById('loginEmail');
+      if(loginEmail) loginEmail.focus();
+
+      busy(false);
+      toast('Sesión cerrada correctamente.','ok');
+    }
+  }
+
+  async function loadYears(){
+    const token=localStorage.getItem(SESSION_KEY);
+    const sel=document.getElementById('yearSelect');
+    try{
+      const res=await gas('getAvailableYears',token);
+      if(!res.ok) throw new Error(res.message);
+      const nowY=new Date().getFullYear();
+      const years=res.years || [nowY];
+      sel.innerHTML=years.map(y=>`<option value="${y}">${y}</option>`).join('');
+      sel.value=years.includes(nowY)?nowY:years[years.length-1];
+    }catch(err){
+      const y=new Date().getFullYear();
+      sel.innerHTML=[y,y+1,y+2].map(n=>`<option value="${n}">${n}</option>`).join('');
+      sel.value=y;
+    }
+  }
+
+  async function loadAvailability(){
+    const token=localStorage.getItem(SESSION_KEY);
+    const year=Number(document.getElementById('yearSelect').value || new Date().getFullYear());
+    const month=Number(document.getElementById('monthSelect').value || new Date().getMonth()+1);
+    busy(true);
+    try{
+      const res=await gas('getAvailability',token,year,month);
+      if(!res.ok){
+        if((res.message||'').toLowerCase().includes('sesión')){localStorage.removeItem(SESSION_KEY);location.reload();return;}
+        throw new Error(res.message);
+      }
+      renderAvailability(res);
+    }catch(err){toast(errorText(err),'err')} finally{busy(false)}
+  }
+
+  function renderAvailability(data){
+    document.getElementById('monthTitle').textContent=`${capitalize(data.monthName || MONTHS[data.month-1])} ${data.year}`;
+    document.getElementById('sheetHint').textContent=data.sheetFound
+      ? `Fuente: pestaña “${data.sheetName}” + bloqueos de la app`
+      : 'Sin pestaña mensual: se muestra el catálogo de salones y los bloqueos de la app.';
+    setText('stAvailable',data.summary?.available||0);setText('stOccupied',data.summary?.deadlineReached||0);setText('stTentative',data.summary?.tentative||0);setText('stGuaranteed',data.summary?.guaranteed||0);
+
+    const box=document.getElementById('chartContainer');
+    if(!data.salons?.length){
+      box.innerHTML=`<div class="empty-state"><strong>Sin información para ${escapeHtml(MONTHS[data.month-1])} ${data.year}</strong>No hay salones configurados para mostrar.</div>`;
+      return;
+    }
+
+    let html='<table class="chart"><thead><tr><th class="salon-col" rowspan="2">SALÓN / ÁREA</th>';
+    data.days.forEach(d=>{html+=`<th class="dow">${escapeHtml(d.dow)}</th>`});
+    html+='</tr><tr>';
+    data.days.forEach(d=>{html+=`<th class="day">${d.day}</th>`});
+    html+='</tr></thead><tbody>';
+
+    data.salons.forEach(s=>{
+      html+=`<tr><td class="salon-col" title="${escapeAttr(s.name)}">${escapeHtml(s.name)}</td>`;
+      s.cells.forEach((c,i)=>{
+        const weekend = ['S','D'].includes(data.days[i]?.dow) ? ' weekend' : '';
+        const title = c.managedBlock
+          ? `${s.name} · ${i+1} ${MONTHS[data.month-1]} · ${statusLabel(c.status)} · ${c.blockEvent||c.code||''}`+
+            `${c.blockUser?' · Usuario: '+c.blockUser:''}`+
+            `${c.status==='tentative' && c.blockDeadline?' · Fecha límite: '+c.blockDeadline:''}`+
+            `${c.deadlineDue?' · FECHA LÍMITE ALCANZADA':''}`
+          : `${s.name} · ${i+1} ${MONTHS[data.month-1]} · ${statusLabel(c.status)}${c.code?' · '+c.code:''}`;
+        html+=`<td class="slot ${c.status}${c.deadlineDue?' deadline-due':''}${weekend}" title="${escapeAttr(title)}"><span class="code">${escapeHtml(c.code||'')}</span></td>`;
+      });
+      html+='</tr>';
+    });
+    html+='</tbody></table>';
+    box.innerHTML=html;
+  }
+
+
+
+  let dashboardData=null;
+
+  async function openDashboard(){
+    document.getElementById('dashboardModal').classList.remove('hidden');
+    document.getElementById('dashboardBody').innerHTML=
+      '<div class="dashboard-loading"><strong>Cargando dashboard...</strong>Calculando indicadores y gráficas.</div>';
+
+    const token=localStorage.getItem(SESSION_KEY);
+
+    try{
+      const res=await gas('getDashboardData',token);
+      if(!res.ok) throw new Error(res.message);
+
+      dashboardData=res;
+      renderDashboard(res);
+
+    }catch(err){
+      document.getElementById('dashboardBody').innerHTML=
+        `<div class="dashboard-loading"><strong>No fue posible cargar el dashboard</strong>${escapeHtml(errorText(err))}</div>`;
+      toast(errorText(err),'err');
+    }
+  }
+
+  function closeDashboard(){
+    document.getElementById('dashboardModal').classList.add('hidden');
+  }
+
+  function dashboardBackdropClick(e){
+    if(e.target.id==='dashboardModal') closeDashboard();
+  }
+
+  function renderDashboard(data){
+    dashboardData=data;
+    document.getElementById('dashboardGenerated').textContent=
+      `Información completa de bloqueos · Generado ${data.generatedAt||''}`;
+
+    const t=data.totals||{};
+    const oldest=data.highlights?.oldestTentativeUser||'Sin datos';
+    const mostCancelled=data.highlights?.mostCancelledUser||'Sin datos';
+    const mostGuaranteed=data.highlights?.mostGuaranteedUser||'Sin datos';
+    const leastGuaranteed=data.highlights?.leastGuaranteedUser||'Sin datos';
+
+    let totalsRows='';
+    (data.totalsByUser||[]).forEach(r=>{
+      totalsRows+=
+        `<tr>`+
+          `<td><strong>${escapeHtml(r.usuario)}</strong></td>`+
+          `<td>${r.tentative}</td>`+
+          `<td>${r.guaranteed}</td>`+
+          `<td>${r.cancelled}</td>`+
+          `<td>${r.deadlineReached}</td>`+
+        `</tr>`;
+    });
+
+    if(!totalsRows){
+      totalsRows='<tr><td colspan="5">Sin información.</td></tr>';
+    }
+
+    let agingRows='';
+    (data.tentativeAging||[]).forEach(r=>{
+      const hi=r.usuario===oldest?' class="highlight"':'';
+      agingRows+=
+        `<tr${hi}>`+
+          `<td><strong>${escapeHtml(r.usuario)}</strong></td>`+
+          `<td>${r.tentative}</td>`+
+          `<td>${escapeHtml(r.oldestTentativeEvent||'—')}</td>`+
+          `<td>${escapeHtml(r.oldestTentativeCreated||'—')}</td>`+
+          `<td><strong>${r.oldestTentativeAgeDays}</strong></td>`+
+        `</tr>`;
+    });
+
+    if(!agingRows){
+      agingRows='<tr><td colspan="5">No hay bloqueos TENTATIVOS activos.</td></tr>';
+    }
+
+    const html=
+      `<div class="dashboard-kpis">`+
+        `<div class="dashboard-kpi"><span>Tentativos activos</span><strong>${t.tentative||0}</strong></div>`+
+        `<div class="dashboard-kpi"><span>Garantizados activos</span><strong>${t.guaranteed||0}</strong></div>`+
+        `<div class="dashboard-kpi"><span>Cancelados históricos</span><strong>${t.cancelled||0}</strong></div>`+
+        `<div class="dashboard-kpi"><span>Fecha límite alcanzada</span><strong>${t.deadlineReached||0}</strong></div>`+
+      `</div>`+
+
+      `<div class="dashboard-grid">`+
+        `<section class="dashboard-card full">`+
+          `<h4>Totales de bloqueos por usuario</h4>`+
+          `<p class="sub">“Fecha límite alcanzada” es un subconjunto de los bloqueos TENTATIVOS activos.</p>`+
+          `<div class="dash-table-wrap"><table class="dash-table"><thead><tr>`+
+            `<th>Usuario</th><th>Tentativos</th><th>Garantizados</th><th>Cancelados</th><th>Fecha límite alcanzada</th>`+
+          `</tr></thead><tbody>${totalsRows}</tbody></table></div>`+
+        `</section>`+
+
+        `<section class="dashboard-card full">`+
+          `<h4>Gráfica general por usuario</h4>`+
+          `<p class="sub">Comparativo de TENTATIVOS, GARANTIZADOS, CANCELADOS y FECHA LÍMITE ALCANZADA.</p>`+
+          `<div class="chart-canvas-wrap"><canvas id="overallBarChart"></canvas></div>`+
+        `</section>`+
+
+        `<section class="dashboard-card">`+
+          `<h4>Antigüedad de bloqueos TENTATIVOS</h4>`+
+          `<p class="sub">Se destaca el usuario que conserva el bloqueo TENTATIVO más antiguo desde su ingreso al sistema.</p>`+
+          `<div class="dash-table-wrap"><table class="dash-table"><thead><tr>`+
+            `<th>Usuario</th><th>Tentativos</th><th>Bloqueo más antiguo</th><th>Fecha ingreso</th><th>Días</th>`+
+          `</tr></thead><tbody>${agingRows}</tbody></table></div>`+
+          `<div class="dash-highlight"><span class="dash-pill">Mayor antigüedad: <strong>${escapeHtml(oldest)}</strong></span></div>`+
+        `</section>`+
+
+        `<section class="dashboard-card">`+
+          `<h4>Bloqueos CANCELADOS por usuario</h4>`+
+          `<p class="sub">La barra más alta identifica al usuario con más bloqueos cancelados en el sistema.</p>`+
+          `<div class="chart-canvas-wrap"><canvas id="cancelledBarChart"></canvas></div>`+
+          `<div class="dash-highlight"><span class="dash-pill">Más cancelados: <strong>${escapeHtml(mostCancelled)}</strong></span></div>`+
+        `</section>`+
+
+        `<section class="dashboard-card full">`+
+          `<h4>Distribución de bloqueos GARANTIZADOS</h4>`+
+          `<p class="sub">Participación por usuario sobre los bloqueos GARANTIZADOS activos.</p>`+
+          `<div class="chart-canvas-wrap"><canvas id="guaranteedPieChart"></canvas></div>`+
+          `<div class="dash-highlight">`+
+            `<span class="dash-pill">Más garantizados: <strong>${escapeHtml(mostGuaranteed)}</strong></span>`+
+            `<span class="dash-pill">Menos garantizados: <strong>${escapeHtml(leastGuaranteed)}</strong></span>`+
+          `</div>`+
+        `</section>`+
+
+      `</div>`;
+
+    document.getElementById('dashboardBody').innerHTML=html;
+
+    requestAnimationFrame(()=>{
+      drawOverallBarChart(document.getElementById('overallBarChart'),data.totalsByUser||[]);
+      drawCancelledBarChart(document.getElementById('cancelledBarChart'),data.cancelledByUser||[],mostCancelled);
+      drawGuaranteedPieChart(document.getElementById('guaranteedPieChart'),data.guaranteedByUser||[],mostGuaranteed,leastGuaranteed);
+    });
+  }
+
+  const DASH_COLORS=['#7c3aed','#0ea5e9','#f59e0b','#ef4444','#10b981','#ec4899','#6366f1','#84cc16','#14b8a6','#f97316','#8b5cf6','#06b6d4'];
+
+  function setupCanvas(canvas,height=350){
+    if(!canvas) return null;
+
+    const dpr=window.devicePixelRatio||1;
+    const width=Math.max(620,canvas.parentElement.clientWidth||900);
+
+    canvas.width=Math.round(width*dpr);
+    canvas.height=Math.round(height*dpr);
+    canvas.style.height=height+'px';
+
+    const ctx=canvas.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,width,height);
+
+    return {ctx,width,height};
+  }
+
+  function drawOverallBarChart(canvas,rows){
+    const setup=setupCanvas(canvas,380);
+    if(!setup) return;
+    const {ctx,width,height}=setup;
+
+    if(!rows.length){
+      drawEmptyChart(ctx,width,height,'Sin datos');
+      return;
+    }
+
+    const categories=[
+      {key:'tentative',label:'Tentativos',color:'#facc15'},
+      {key:'guaranteed',label:'Garantizados',color:'#ef4444'},
+      {key:'cancelled',label:'Cancelados',color:'#6b7280'},
+      {key:'deadlineReached',label:'Fecha límite alcanzada',color:'#8b5cf6'}
+    ];
+
+    const margin={left:54,right:20,top:48,bottom:90};
+    const plotW=width-margin.left-margin.right;
+    const plotH=height-margin.top-margin.bottom;
+    const maxVal=Math.max(1,...rows.flatMap(r=>categories.map(c=>Number(r[c.key]||0))));
+    const groupW=plotW/rows.length;
+    const barW=Math.max(5,Math.min(24,(groupW-10)/categories.length));
+
+    drawGrid(ctx,margin.left,margin.top,plotW,plotH,maxVal);
+
+    rows.forEach((r,i)=>{
+      const totalBars=categories.length*barW;
+      const startX=margin.left+i*groupW+(groupW-totalBars)/2;
+
+      categories.forEach((cat,j)=>{
+        const val=Number(r[cat.key]||0);
+        const h=(val/maxVal)*plotH;
+        ctx.fillStyle=cat.color;
+        ctx.fillRect(startX+j*barW,margin.top+plotH-h,barW-2,h);
+
+        if(val){
+          ctx.fillStyle='#3f314b';
+          ctx.font='10px Arial';
+          ctx.textAlign='center';
+          ctx.fillText(String(val),startX+j*barW+(barW-2)/2,margin.top+plotH-h-4);
+        }
+      });
+
+      ctx.save();
+      ctx.translate(margin.left+i*groupW+groupW/2,height-72);
+      ctx.rotate(-Math.PI/5);
+      ctx.fillStyle='#5f5668';
+      ctx.font='10px Arial';
+      ctx.textAlign='right';
+      ctx.fillText(shortLabel(r.usuario,22),0,0);
+      ctx.restore();
+    });
+
+    drawLegend(ctx,categories.map(c=>({label:c.label,color:c.color})),margin.left,16,width-margin.left);
+  }
+
+  function drawCancelledBarChart(canvas,rows,highlightUser){
+    const setup=setupCanvas(canvas,350);
+    if(!setup) return;
+    const {ctx,width,height}=setup;
+
+    if(!rows.length){
+      drawEmptyChart(ctx,width,height,'Sin datos de cancelaciones');
+      return;
+    }
+
+    const margin={left:50,right:18,top:28,bottom:88};
+    const plotW=width-margin.left-margin.right;
+    const plotH=height-margin.top-margin.bottom;
+    const maxVal=Math.max(1,...rows.map(r=>Number(r.cancelled||0)));
+    const groupW=plotW/rows.length;
+    const barW=Math.max(10,Math.min(46,groupW*.58));
+
+    drawGrid(ctx,margin.left,margin.top,plotW,plotH,maxVal);
+
+    rows.forEach((r,i)=>{
+      const val=Number(r.cancelled||0);
+      const h=(val/maxVal)*plotH;
+      const x=margin.left+i*groupW+(groupW-barW)/2;
+
+      ctx.fillStyle=r.usuario===highlightUser ? '#7c3aed' : DASH_COLORS[i%DASH_COLORS.length];
+      ctx.fillRect(x,margin.top+plotH-h,barW,h);
+
+      ctx.fillStyle='#3f314b';
+      ctx.font='10px Arial';
+      ctx.textAlign='center';
+      ctx.fillText(String(val),x+barW/2,margin.top+plotH-h-5);
+
+      ctx.save();
+      ctx.translate(x+barW/2,height-70);
+      ctx.rotate(-Math.PI/5);
+      ctx.fillStyle='#5f5668';
+      ctx.textAlign='right';
+      ctx.fillText(shortLabel(r.usuario,22),0,0);
+      ctx.restore();
+    });
+  }
+
+  function drawGuaranteedPieChart(canvas,rows,mostUser,leastUser){
+    const setup=setupCanvas(canvas,380);
+    if(!setup) return;
+    const {ctx,width,height}=setup;
+
+    const valid=rows.filter(r=>Number(r.guaranteed||0)>0);
+    if(!valid.length){
+      drawEmptyChart(ctx,width,height,'Sin bloqueos GARANTIZADOS activos');
+      return;
+    }
+
+    const total=valid.reduce((s,r)=>s+Number(r.guaranteed||0),0);
+    const cx=Math.min(width*.38,360);
+    const cy=height*.48;
+    const radius=Math.min(125,height*.34,width*.25);
+    let start=-Math.PI/2;
+
+    valid.forEach((r,i)=>{
+      const val=Number(r.guaranteed||0);
+      const angle=(val/total)*Math.PI*2;
+      const end=start+angle;
+
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,radius,start,end);
+      ctx.closePath();
+      ctx.fillStyle=DASH_COLORS[i%DASH_COLORS.length];
+      ctx.fill();
+
+      const mid=(start+end)/2;
+      if(angle>.22){
+        ctx.fillStyle='#fff';
+        ctx.font='bold 11px Arial';
+        ctx.textAlign='center';
+        ctx.fillText(
+          String(val),
+          cx+Math.cos(mid)*radius*.62,
+          cy+Math.sin(mid)*radius*.62+4
+        );
+      }
+
+      start=end;
+    });
+
+    let lx=Math.max(width*.62,480);
+    let ly=52;
+    valid.forEach((r,i)=>{
+      ctx.fillStyle=DASH_COLORS[i%DASH_COLORS.length];
+      ctx.fillRect(lx,ly-10,12,12);
+      ctx.fillStyle='#4f4657';
+      ctx.font=(r.usuario===mostUser || r.usuario===leastUser)?'bold 11px Arial':'11px Arial';
+      ctx.textAlign='left';
+
+      let suffix='';
+      if(r.usuario===mostUser) suffix+=' · MÁS';
+      if(r.usuario===leastUser) suffix+=' · MENOS';
+
+      ctx.fillText(`${shortLabel(r.usuario,28)}: ${r.guaranteed}${suffix}`,lx+18,ly);
+      ly+=23;
+    });
+  }
+
+  function drawGrid(ctx,x,y,w,h,maxVal){
+    ctx.strokeStyle='#e9e3ed';
+    ctx.lineWidth=1;
+    ctx.fillStyle='#7a7085';
+    ctx.font='10px Arial';
+    ctx.textAlign='right';
+
+    const steps=5;
+    for(let i=0;i<=steps;i++){
+      const yy=y+h-(i/steps)*h;
+      ctx.beginPath();
+      ctx.moveTo(x,yy);
+      ctx.lineTo(x+w,yy);
+      ctx.stroke();
+
+      const label=Math.round((i/steps)*maxVal);
+      ctx.fillText(String(label),x-7,yy+3);
+    }
+  }
+
+  function drawLegend(ctx,items,x,y,maxWidth){
+    let xx=x;
+    let yy=y;
+    ctx.font='10px Arial';
+
+    items.forEach(item=>{
+      const textW=ctx.measureText(item.label).width+34;
+      if(xx+textW>x+maxWidth){
+        xx=x;
+        yy+=18;
+      }
+      ctx.fillStyle=item.color;
+      ctx.fillRect(xx,yy-9,11,11);
+      ctx.fillStyle='#574d61';
+      ctx.textAlign='left';
+      ctx.fillText(item.label,xx+16,yy);
+      xx+=textW;
+    });
+  }
+
+  function drawEmptyChart(ctx,width,height,text){
+    ctx.fillStyle='#766c82';
+    ctx.font='14px Arial';
+    ctx.textAlign='center';
+    ctx.fillText(text,width/2,height/2);
+  }
+
+  let systemReportData=null;
+
+  async function openSystemReport(){
+    document.getElementById('systemReportModal').classList.remove('hidden');
+    document.getElementById('systemReportBody').innerHTML=
+      '<div class="system-report-empty"><strong>Cargando reporte...</strong>Consultando todos los bloqueos activos del sistema.</div>';
+
+    const token=localStorage.getItem(SESSION_KEY);
+    try{
+      const res=await gas('getActiveBlocksReport',token);
+      if(!res.ok) throw new Error(res.message);
+      systemReportData=res;
+      renderSystemReport(res);
+    }catch(err){
+      document.getElementById('systemReportBody').innerHTML=
+        `<div class="system-report-empty"><strong>No fue posible cargar el reporte</strong>${escapeHtml(errorText(err))}</div>`;
+      toast(errorText(err),'err');
+    }
+  }
+
+  function closeSystemReport(){
+    document.getElementById('systemReportModal').classList.add('hidden');
+  }
+
+  function systemReportBackdropClick(e){
+    if(e.target.id==='systemReportModal') closeSystemReport();
+  }
+
+  function renderSystemReport(data){
+    const totals=data.totals||{};
+    const groups=data.groups||[];
+    document.getElementById('systemReportGenerated').textContent=
+      `Bloqueos activos de todos los usuarios · Generado ${data.generatedAt||''}`;
+
+    let html=
+      `<div class="system-report-summary">`+
+        `<div class="system-report-kpi"><span>Total activos</span><strong>${totals.total||0}</strong></div>`+
+        `<div class="system-report-kpi"><span>Tentativos</span><strong>${totals.tentative||0}</strong></div>`+
+        `<div class="system-report-kpi"><span>Garantizados</span><strong>${totals.guaranteed||0}</strong></div>`+
+      `</div>`;
+
+    if(!groups.length){
+      html+='<div class="system-report-empty"><strong>Sin bloqueos activos</strong>No hay bloqueos TENTATIVOS ni GARANTIZADOS para mostrar.</div>';
+      document.getElementById('systemReportBody').innerHTML=html;
+      return;
+    }
+
+    groups.forEach(g=>{
+      let rows='';
+      (g.blocks||[]).forEach(b=>{
+        const salons=[...new Set((b.selections||[]).map(x=>x.salon).filter(Boolean))].join(', ');
+        rows+=
+          `<tr>`+
+            `<td><strong>${escapeHtml(b.evento||'')}</strong></td>`+
+            `<td><span class="system-report-status ${escapeAttr(b.status||'')}">${escapeHtml(statusLabel(b.status||''))}</span></td>`+
+            `<td>${escapeHtml(b.usuarioNombre||'—')}</td>`+
+            `<td>${escapeHtml(b.fechaEntrada||'—')}</td>`+
+            `<td>${escapeHtml(b.fechaSalida||'—')}</td>`+
+            `<td>${escapeHtml(b.status==='tentative' ? (b.fechaLimite||'—') : '—')}</td>`+
+            `<td>${escapeHtml(salons||'—')}</td>`+
+          `</tr>`;
+      });
+
+      html+=
+        `<section class="system-report-month">`+
+          `<div class="system-report-month-head">`+
+            `<strong>${escapeHtml(g.monthName||'Mes')} ${g.year||''}</strong>`+
+            `<span>${(g.blocks||[]).length} bloqueo(s) · ${g.tentative||0} tentativo(s) · ${g.guaranteed||0} garantizado(s)</span>`+
+          `</div>`+
+          `<div class="system-report-table-wrap"><table class="system-report-table">`+
+            `<thead><tr><th>Evento</th><th>Status</th><th>Usuario</th><th>Entrada</th><th>Salida</th><th>Fecha límite</th><th>Salón(es)</th></tr></thead>`+
+            `<tbody>${rows}</tbody>`+
+          `</table></div>`+
+        `</section>`;
+    });
+
+    document.getElementById('systemReportBody').innerHTML=html;
+  }
+
+  function printSystemReport(){
+    if(!systemReportData) return toast('Primero carga el reporte.','err');
+    document.body.classList.add('printing-system-report');
+    window.print();
+    setTimeout(()=>document.body.classList.remove('printing-system-report'),300);
+  }
+
+  function shortLabel(text,max){
+    text=String(text||'');
+    return text.length>max ? text.slice(0,max-1)+'…' : text;
+  }
+
+  function printDashboard(){
+    if(!dashboardData) return toast('Primero carga el dashboard.','err');
+    document.body.classList.add('printing-dashboard');
+    window.print();
+    setTimeout(()=>document.body.classList.remove('printing-dashboard'),300);
+  }
+
+  function emailDashboard(){
+    if(!dashboardData) return toast('Primero carga el dashboard.','err');
+
+    const modal=document.getElementById('emailDashboardModal');
+    const input=document.getElementById('dashboardEmailTo');
+    input.value=currentUser?.email||'';
+    modal.classList.remove('hidden');
+    setTimeout(()=>{ input.focus(); input.select(); },50);
+  }
+
+  function closeEmailDashboardModal(){
+    document.getElementById('emailDashboardModal').classList.add('hidden');
+  }
+
+  function emailDashboardBackdropClick(e){
+    if(e.target.id==='emailDashboardModal') closeEmailDashboardModal();
+  }
+
+  async function submitDashboardEmail(e){
+    e.preventDefault();
+    if(!dashboardData) return toast('Primero carga el dashboard.','err');
+
+    const input=document.getElementById('dashboardEmailTo');
+    const email=String(input.value||'').trim();
+    if(!email) return toast('Ingresa un correo electrónico.','err');
+    if(!input.checkValidity()){
+      input.reportValidity();
+      return;
+    }
+
+    const btn=document.getElementById('sendDashboardEmailBtn');
+    btn.disabled=true;
+    busy(true);
+    try{
+      const token=localStorage.getItem(SESSION_KEY);
+      const res=await gas('sendDashboardEmail',token,email);
+      if(!res.ok) return toast(res.message,'err');
+
+      closeEmailDashboardModal();
+      toast(res.message,'ok');
+    }catch(err){
+      toast(errorText(err),'err');
+    }finally{
+      btn.disabled=false;
+      busy(false);
+    }
+  }
+
+  function whatsappDashboard(){
+    if(!dashboardData) return toast('Primero carga el dashboard.','err');
+
+    const t=dashboardData.totals||{};
+    const h=dashboardData.highlights||{};
+    const appUrl=window.location.href.split('?')[0];
+
+    const text=
+      `DASHBOARD DE BLOQUEOS - GRUPO DORADOS\n`+
+      `Generado: ${dashboardData.generatedAt||''}\n\n`+
+      `Tentativos: ${t.tentative||0}\n`+
+      `Garantizados: ${t.guaranteed||0}\n`+
+      `Cancelados: ${t.cancelled||0}\n`+
+      `Fecha límite alcanzada: ${t.deadlineReached||0}\n\n`+
+      `Mayor antigüedad en tentativo: ${h.oldestTentativeUser||'Sin datos'}\n`+
+      `Más cancelados: ${h.mostCancelledUser||'Sin datos'}\n`+
+      `Más garantizados: ${h.mostGuaranteedUser||'Sin datos'}\n`+
+      `Menos garantizados: ${h.leastGuaranteedUser||'Sin datos'}\n\n`+
+      `Abrir dashboard: ${appUrl}`;
+
+    window.open(
+      'https://wa.me/?text='+encodeURIComponent(text),
+      '_blank',
+      'noopener,noreferrer'
+    );
+  }
+
+  let blockMode='new';
+  let blocksCache=[];
+  let editingBlockId='';
+  let pendingSelections=new Set();
+
+  async function openBlockModal(){
+    document.getElementById('blockModal').classList.remove('hidden');
+    await refreshBlocksCache();
+    setBlockMode('new');
+  }
+
+  function closeBlockModal(){
+    document.getElementById('blockModal').classList.add('hidden');
+  }
+
+  function modalBackdropClick(e){
+    if(e.target.id==='blockModal') closeBlockModal();
+  }
+
+  async function refreshBlocksCache(){
+    const token=localStorage.getItem(SESSION_KEY);
+
+    try{
+      const res=await gas('getBlocks',token);
+
+      if(!res.ok) throw new Error(res.message);
+
+      blocksCache=res.blocks||[];
+
+    }catch(err){
+      toast(errorText(err),'err');
+    }
+  }
+
+  function selectedChartPeriod(){
+    return {
+      year:Number(document.getElementById('yearSelect').value||new Date().getFullYear()),
+      month:Number(document.getElementById('monthSelect').value||new Date().getMonth()+1)
+    };
+  }
+
+  function blockStartsInSelectedMonth(b){
+    if(!b?.fechaEntrada) return false;
+    const parts=String(b.fechaEntrada).split('-').map(Number);
+    if(parts.length!==3) return false;
+
+    const period=selectedChartPeriod();
+    return parts[0]===period.year && parts[1]===period.month;
+  }
+
+  function fillBlockPicker(){
+    const sel=document.getElementById('existingBlockSelect');
+    const period=selectedChartPeriod();
+    const monthName=MONTHS[period.month-1]||'Mes';
+    const label=document.getElementById('blockPickerLabel');
+
+    // Modificar: exclusivamente bloqueos cuya FECHA DE ENTRADA corresponde
+    // al mes/año que está seleccionado en el chart.
+    const list=blockMode==='edit'
+      ? blocksCache.filter(blockStartsInSelectedMonth)
+      : blocksCache.slice();
+
+    if(blockMode==='edit'){
+      label.textContent=`SELECCIONA UNO DE TUS BLOQUEOS DE ${monthName.toUpperCase()} ${period.year}`;
+    }else{
+      label.textContent='SELECCIONA UNO DE TUS BLOQUEOS';
+    }
+
+    const opts=[
+      `<option value="">${
+        blockMode==='edit'
+          ? `Selecciona uno de tus bloqueos de ${escapeHtml(monthName)} ${period.year}...`
+          : 'Selecciona uno de tus bloqueos...'
+      }</option>`
+    ];
+
+    list.forEach(b=>{
+      const userText=b.usuarioNombre ? ` · Usuario: ${b.usuarioNombre}` : '';
+      const limitText=(b.status==='tentative' && b.fechaLimite)
+        ? ` · Límite: ${b.fechaLimite}`
+        : '';
+
+      const todayIso=localIso(new Date());
+      const deadlineReached=b.status==='tentative' && b.fechaLimite && b.fechaLimite<=todayIso;
+      const optionStyle=deadlineReached
+        ? 'background:#c4b5fd;color:#2e1065;font-weight:800;'
+        : b.status==='guaranteed'
+          ? 'background:#ff6b6b;color:#111827;font-weight:700;'
+          : 'background:#fde047;color:#111827;font-weight:700;';
+
+      opts.push(
+        `<option value="${escapeAttr(b.id)}" style="${optionStyle}">`+
+        `${escapeHtml(b.evento)} · ${escapeHtml(b.fechaEntrada)} a ${escapeHtml(b.fechaSalida)} · ${escapeHtml(statusLabel(b.status))}`+
+        `${escapeHtml(userText)}${escapeHtml(limitText)}`+
+        `</option>`
+      );
+    });
+
+    sel.innerHTML=opts.join('');
+    document.getElementById('existingBlockSummary').classList.add('hidden');
+
+    if(blockMode==='edit' && !list.length){
+      document.getElementById('existingBlockSummary').innerHTML=
+        `<strong>Sin bloqueos para modificar</strong><br>`+
+        `No tienes bloqueos activos cuya fecha de entrada corresponda a ${escapeHtml(monthName)} ${period.year}.`;
+      document.getElementById('existingBlockSummary').classList.remove('hidden');
+    }
+  }
+
+  function setBlockMode(mode){
+    blockMode=mode;
+
+    document.getElementById('modeNewBtn').classList.toggle('active',mode==='new');
+    document.getElementById('modeEditBtn').classList.toggle('active',mode==='edit');
+    document.getElementById('modeCancelBtn').classList.toggle('active',mode==='cancel');
+    document.getElementById('modeReportBtn').classList.toggle('active',mode==='report');
+
+    const picker=document.getElementById('blockPicker');
+    const editor=document.getElementById('blockEditor');
+    const cancel=document.getElementById('cancelPanel');
+    const report=document.getElementById('cancelledReportPanel');
+
+    picker.classList.toggle('hidden',mode==='new' || mode==='report');
+    editor.classList.toggle('hidden',mode==='cancel' || mode==='report');
+    cancel.classList.toggle('hidden',mode!=='cancel');
+    report.classList.toggle('hidden',mode!=='report');
+
+    editingBlockId='';
+    pendingSelections=new Set();
+
+    document.getElementById('selectionWrap').classList.add('hidden');
+    document.getElementById('selectionGrid').innerHTML='';
+
+    if(mode==='report'){
+      loadCancelledReport();
+      return;
+    }
+
+    if(mode==='new'){
+      document.getElementById('existingBlockSelect').value='';
+      document.getElementById('blockEvent').value='';
+
+      const y=Number(document.getElementById('yearSelect').value||new Date().getFullYear());
+      const m=Number(document.getElementById('monthSelect').value||new Date().getMonth()+1);
+      const today=new Date();
+      const todayIso=localIso(today);
+      const selectedMonthFirst=`${y}-${String(m).padStart(2,'0')}-01`;
+      const defaultDate=selectedMonthFirst<todayIso ? todayIso : selectedMonthFirst;
+
+      const startInput=document.getElementById('blockStart');
+      const endInput=document.getElementById('blockEnd');
+      const statusInput=document.getElementById('blockStatus');
+
+      startInput.min=todayIso;
+      endInput.min=todayIso;
+      startInput.value=defaultDate;
+      endInput.value=defaultDate;
+
+      statusInput.disabled=false;
+      statusInput.value='tentative';
+
+      const deadlineInput=document.getElementById('blockDeadline');
+      deadlineInput.min=todayIso;
+      deadlineInput.max=defaultDate;
+      deadlineInput.value=todayIso;
+
+      document.getElementById('deadlineField').classList.remove('hidden');
+      document.getElementById('statusLockHint').classList.add('hidden');
+      setEditorLocked(false);
+      document.getElementById('saveBlockBtn').textContent='Guardar nuevo bloqueo';
+
+    }else{
+      fillBlockPicker();
+      const todayIso=localIso(new Date());
+      document.getElementById('blockStart').min=todayIso;
+      document.getElementById('blockEnd').min=todayIso;
+      document.getElementById('blockStatus').disabled=false;
+      document.getElementById('statusLockHint').classList.add('hidden');
+      document.getElementById('deadlineField').classList.add('hidden');
+      setEditorLocked(false);
+      document.getElementById('saveBlockBtn').textContent='Guardar modificaciones';
+      document.getElementById('cancelText').textContent='Selecciona arriba uno de tus bloqueos para cancelarlo.';
+    }
+  }
+
+  async function loadCancelledReport(){
+    const token=localStorage.getItem(SESSION_KEY);
+    const period=selectedChartPeriod();
+    const monthName=MONTHS[period.month-1]||'Mes';
+
+    document.getElementById('cancelledReportTitle').textContent=
+      `Reporte de cancelados · ${monthName} ${period.year}`;
+    document.getElementById('cancelledReportSubtitle').textContent=
+      'Se muestran únicamente tus bloqueos cancelados cuya fecha de entrada pertenece al mes seleccionado.';
+
+    const box=document.getElementById('cancelledReportContent');
+    box.innerHTML='<div class="report-empty"><strong>Cargando reporte...</strong>Consultando el histórico de cancelaciones.</div>';
+
+    try{
+      const res=await gas('getCancelledBlocksReport',token,period.year,period.month);
+
+      if(!res.ok) throw new Error(res.message);
+
+      renderCancelledReport(res.rows||[]);
+
+    }catch(err){
+      box.innerHTML=
+        `<div class="report-empty"><strong>No fue posible cargar el reporte</strong>${escapeHtml(errorText(err))}</div>`;
+      toast(errorText(err),'err');
+    }
+  }
+
+  function renderCancelledReport(rows){
+    const box=document.getElementById('cancelledReportContent');
+
+    if(!rows.length){
+      const period=selectedChartPeriod();
+      box.innerHTML=
+        `<div class="report-empty"><strong>Sin bloqueos cancelados</strong>`+
+        `No tienes bloqueos cancelados con fecha de entrada en ${escapeHtml(MONTHS[period.month-1])} ${period.year}.`+
+        `</div>`;
+      return;
+    }
+
+    let html='<table class="report-table"><thead><tr>'+
+      '<th>Evento</th>'+
+      '<th>Entrada</th>'+
+      '<th>Salida</th>'+
+      '<th>Status</th>'+
+      '<th>Fecha límite</th>'+
+      '<th>Salones / fechas</th>'+
+      '<th>Cancelado por</th>'+
+      '<th>Motivo</th>'+
+      '<th>Fecha y hora cancelación</th>'+
+      '</tr></thead><tbody>';
+
+    rows.forEach(r=>{
+      const selectionText=(r.selections||[])
+        .map(s=>`${s.salon} · ${s.date}`)
+        .join(', ');
+
+      html+='<tr>'+
+        `<td><strong>${escapeHtml(r.evento||'')}</strong></td>`+
+        `<td>${escapeHtml(r.fechaEntrada||'')}</td>`+
+        `<td>${escapeHtml(r.fechaSalida||'')}</td>`+
+        `<td><span class="report-status ${escapeAttr(r.status||'')}">${escapeHtml(statusLabel(r.status||''))}</span></td>`+
+        `<td>${escapeHtml(r.fechaLimite||'—')}</td>`+
+        `<td>${escapeHtml(selectionText||'—')}</td>`+
+        `<td>${escapeHtml(r.canceladoPor||'—')}</td>`+
+        `<td>${escapeHtml(r.motivo||'—')}</td>`+
+        `<td>${escapeHtml(r.fechaHoraCancelacion||'—')}</td>`+
+        '</tr>';
+    });
+
+    html+='</tbody></table>';
+    box.innerHTML=html;
+  }
+
+  async function existingBlockChanged(){
+    const id=document.getElementById('existingBlockSelect').value;
+    const b=blocksCache.find(x=>x.id===id);
+    const summary=document.getElementById('existingBlockSummary');
+
+    if(!b){
+      editingBlockId='';
+      summary.classList.add('hidden');
+      return;
+    }
+
+    summary.innerHTML=
+      `<strong>${escapeHtml(b.evento)}</strong><br>`+
+      `${escapeHtml(b.fechaEntrada)} a ${escapeHtml(b.fechaSalida)} · ${escapeHtml(statusLabel(b.status))}`+
+      `${b.usuarioNombre ? ` · Usuario: ${escapeHtml(b.usuarioNombre)}` : ''}`+
+      `${b.status==='tentative' && b.fechaLimite ? ` · Fecha límite: ${escapeHtml(b.fechaLimite)}` : ''}<br>`+
+      `${b.selections.length} selección(es) de salón/fecha`;
+
+    summary.classList.remove('hidden');
+
+    if(blockMode==='cancel'){
+      editingBlockId=b.id;
+
+      document.getElementById('cancelText').innerHTML=
+        `Vas a cancelar <strong>${escapeHtml(b.evento)}</strong>. `+
+        `El bloqueo dejará de mostrarse en el chart y se enviará al histórico de cancelados.`;
+
+      return;
+    }
+
+    editingBlockId=b.id;
+
+    const todayIso=localIso(new Date());
+    const statusInput=document.getElementById('blockStatus');
+    const statusHint=document.getElementById('statusLockHint');
+    const startInput=document.getElementById('blockStart');
+    const endInput=document.getElementById('blockEnd');
+
+    document.getElementById('blockEvent').value=b.evento||'';
+    startInput.min=todayIso;
+    endInput.min=todayIso;
+    startInput.value=b.fechaEntrada||'';
+    endInput.value=b.fechaSalida||'';
+
+    const deadlineInput=document.getElementById('blockDeadline');
+    const deadlineField=document.getElementById('deadlineField');
+
+    statusInput.value=b.status==='guaranteed' ? 'guaranteed' : 'tentative';
+    statusInput.disabled=b.status==='guaranteed';
+    statusHint.classList.toggle('hidden',b.status!=='guaranteed');
+
+    deadlineInput.min=todayIso;
+    deadlineInput.max=b.fechaEntrada||'';
+    deadlineInput.value=b.fechaLimite||todayIso;
+    deadlineField.classList.toggle('hidden',b.status!=='tentative');
+
+    setEditorLocked(!!b.modificationLocked);
+
+    pendingSelections=new Set(
+      (b.selections||[]).map(s=>selectionKey(s.salon,s.date))
+    );
+
+    if(!b.modificationLocked){
+      await buildSelectionGrid(true);
+    }else{
+      document.getElementById('selectionWrap').classList.add('hidden');
+      document.getElementById('selectionGrid').innerHTML='';
+    }
+  }
+
+  function blockStatusChanged(){
+    const status=document.getElementById('blockStatus').value;
+    const deadlineField=document.getElementById('deadlineField');
+    const deadlineInput=document.getElementById('blockDeadline');
+    const todayIso=localIso(new Date());
+
+    if(status==='tentative'){
+      deadlineField.classList.remove('hidden');
+      const startValue=document.getElementById('blockStart').value;
+      deadlineInput.min=todayIso;
+      deadlineInput.max=startValue||'';
+      if(!deadlineInput.value || deadlineInput.value<todayIso){
+        deadlineInput.value=todayIso;
+      }
+      if(startValue && deadlineInput.value>startValue){
+        deadlineInput.value=startValue;
+      }
+      return;
+    }
+
+    deadlineField.classList.add('hidden');
+    showGuaranteeWarning();
+  }
+
+  function deadlineChanged(){
+    const input=document.getElementById('blockDeadline');
+    const startInput=document.getElementById('blockStart');
+    const todayIso=localIso(new Date());
+    const startValue=startInput.value;
+    input.min=todayIso;
+    input.max=startValue||'';
+
+    if(input.value && input.value<todayIso){
+      input.value=todayIso;
+      toast('La fecha límite debe ser igual o mayor al día actual.','err');
+      return;
+    }
+    if(startValue && input.value && input.value>startValue){
+      input.value=startValue;
+      toast('La fecha límite debe ser menor o igual a la fecha de entrada.','err');
+    }
+  }
+
+  function setEditorLocked(locked){
+    document.getElementById('editLockedNote').classList.toggle('hidden',!locked);
+
+    const ids=['blockEvent','blockStart','blockEnd','blockStatus','blockDeadline'];
+    ids.forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.disabled=locked;
+    });
+
+    document.getElementById('selectDatesBtn').disabled=locked;
+    document.getElementById('saveBlockBtn').disabled=locked;
+  }
+
+  function showLicenseExpired(){
+    const modal=document.getElementById('licenseExpiredModal');
+    if(modal) modal.classList.remove('hidden');
+  }
+
+  function closeLicenseExpired(){
+    const modal=document.getElementById('licenseExpiredModal');
+    if(modal) modal.classList.add('hidden');
+  }
+
+  function licenseExpiredBackdropClick(e){
+    if(e.target.id==='licenseExpiredModal') closeLicenseExpired();
+  }
+
+  function showGuaranteeWarning(){
+    document.getElementById('guaranteeWarning').classList.remove('hidden');
+  }
+
+  function closeGuaranteeWarning(){
+    document.getElementById('guaranteeWarning').classList.add('hidden');
+  }
+
+  function guaranteeBackdropClick(e){
+    if(e.target.id==='guaranteeWarning') closeGuaranteeWarning();
+  }
+
+  function blockDatesChanged(){
+    const todayIso=localIso(new Date());
+    const startInput=document.getElementById('blockStart');
+    const endInput=document.getElementById('blockEnd');
+
+    startInput.min=todayIso;
+    endInput.min=todayIso;
+
+    if(startInput.value && startInput.value<todayIso){
+      startInput.value=todayIso;
+      toast('La fecha de entrada no puede ser menor al día actual.','err');
+    }
+
+    if(endInput.value && endInput.value<todayIso){
+      endInput.value=todayIso;
+      toast('La fecha de salida no puede ser menor al día actual.','err');
+    }
+
+    if(startInput.value){
+      endInput.min=startInput.value>todayIso ? startInput.value : todayIso;
+      if(endInput.value && endInput.value<startInput.value){
+        endInput.value=startInput.value;
+      }
+    }
+
+    const deadlineInput=document.getElementById('blockDeadline');
+    if(document.getElementById('blockStatus').value==='tentative'){
+      deadlineInput.min=todayIso;
+      deadlineInput.max=startInput.value||'';
+      if(startInput.value && deadlineInput.value>startInput.value){
+        deadlineInput.value=startInput.value;
+      }
+    }
+
+    document.getElementById('selectionWrap').classList.add('hidden');
+    document.getElementById('selectionGrid').innerHTML='';
+
+    if(blockMode==='new'){
+      pendingSelections=new Set();
+    }
+  }
+
+  async function buildSelectionGrid(preserve=false){
+    const start=v('blockStart');
+    const end=v('blockEnd');
+
+    if(!start||!end){
+      return toast('Selecciona fecha de entrada y fecha de salida.','err');
+    }
+
+    if(start>end){
+      return toast('La fecha de salida no puede ser anterior a la fecha de entrada.','err');
+    }
+
+    const todayIso=localIso(new Date());
+    if(start<todayIso || end<todayIso){
+      return toast('Las fechas del bloqueo no pueden ser menores al día actual.','err');
+    }
+
+    const token=localStorage.getItem(SESSION_KEY);
+
+    busy(true);
+
+    try{
+      const res=await gas(
+        'getBlockingGrid',
+        token,
+        start,
+        end,
+        blockMode==='edit'?editingBlockId:''
+      );
+
+      if(!res.ok){
+        return toast(res.message,'err');
+      }
+
+      if(!preserve){
+        pendingSelections=new Set();
+      }
+
+      renderSelectionGrid(res);
+      document.getElementById('selectionWrap').classList.remove('hidden');
+
+    }catch(err){
+      toast(errorText(err),'err');
+
+    }finally{
+      busy(false);
+    }
+  }
+
+  function renderSelectionGrid(data){
+    let html='<table class="selection-table"><thead><tr><th class="room">SALÓN</th>';
+
+    data.dates.forEach(d=>{
+      const dt=parseLocalIso(d);
+
+      html+=
+        `<th title="${escapeAttr(d)}">`+
+        `${dt.getDate()}<br>`+
+        `<span style="font-weight:500">${escapeHtml(MONTHS[dt.getMonth()].slice(0,3))}</span>`+
+        `</th>`;
+    });
+
+    html+='</tr></thead><tbody>';
+
+    data.rows.forEach(row=>{
+      html+=`<tr><td class="room">${escapeHtml(row.salon)}</td>`;
+
+      row.cells.forEach(c=>{
+        const key=selectionKey(row.salon,c.date);
+        const selected=pendingSelections.has(key);
+
+        const cls=
+          c.available
+            ? 'pickcell'+(selected?' selected':'')
+            : 'pickcell unavailable';
+
+        const title=
+          c.available
+            ? 'Disponible'
+            : `${statusLabel(c.status)}${c.detail?' · '+c.detail:''}`;
+
+        html+=`<td class="${cls}" title="${escapeAttr(title)}">`;
+
+        if(c.available){
+          html+=
+            `<input type="checkbox" ${selected?'checked':''} `+
+            `onchange="toggleSelection(this,'${escapeJs(row.salon)}','${c.date}')">`;
+
+        }else{
+          html+=
+            `<span class="pick-status">${escapeHtml(statusLabel(c.status).slice(0,4))}</span>`;
+        }
+
+        html+='</td>';
+      });
+
+      html+='</tr>';
+    });
+
+    html+='</tbody></table>';
+
+    document.getElementById('selectionGrid').innerHTML=html;
+  }
+
+  function toggleSelection(input,salon,date){
+    const key=selectionKey(salon,date);
+
+    if(input.checked){
+      pendingSelections.add(key);
+    }else{
+      pendingSelections.delete(key);
+    }
+
+    input.closest('td').classList.toggle('selected',input.checked);
+  }
+
+  async function submitBlock(){
+    if(blockMode==='edit' && !editingBlockId){
+      return toast('Selecciona el bloqueo que deseas modificar.','err');
+    }
+
+    const evento=v('blockEvent');
+    const fechaEntrada=v('blockStart');
+    const fechaSalida=v('blockEnd');
+    const status=v('blockStatus');
+    const fechaLimite=v('blockDeadline');
+
+    if(!evento||!fechaEntrada||!fechaSalida){
+      return toast('Completa nombre del evento y fechas.','err');
+    }
+
+    const todayIso=localIso(new Date());
+    if(fechaEntrada<todayIso || fechaSalida<todayIso){
+      return toast('Las fechas del bloqueo no pueden ser menores al día actual.','err');
+    }
+
+    if(fechaEntrada>fechaSalida){
+      return toast('La fecha de salida no puede ser anterior a la fecha de entrada.','err');
+    }
+
+    if(!['tentative','guaranteed'].includes(status)){
+      return toast('El status solo puede ser TENTATIVO o GARANTIZADO.','err');
+    }
+
+    if(status==='tentative'){
+      if(!fechaLimite){
+        return toast('Selecciona la fecha límite del bloqueo TENTATIVO.','err');
+      }
+      if(fechaLimite<todayIso){
+        return toast('La fecha límite debe ser igual o mayor al día actual.','err');
+      }
+      if(fechaLimite>fechaEntrada){
+        return toast('La fecha límite debe ser menor o igual a la fecha de entrada.','err');
+      }
+    }
+
+    const selectedBlock=blocksCache.find(x=>x.id===editingBlockId);
+    if(blockMode==='edit' && selectedBlock?.modificationLocked){
+      return toast('Este bloqueo GARANTIZADO ya no puede modificarse.','err');
+    }
+
+    if(!pendingSelections.size){
+      return toast('Selecciona al menos una fecha de algún salón.','err');
+    }
+
+    const selections=[...pendingSelections].map(k=>{
+      const pos=k.lastIndexOf('|');
+
+      return {
+        salon:k.slice(0,pos),
+        date:k.slice(pos+1)
+      };
+    });
+
+    const payload={
+      id:blockMode==='edit'?editingBlockId:'',
+      evento,
+      fechaEntrada,
+      fechaSalida,
+      status,
+      fechaLimite:status==='tentative'?fechaLimite:'',
+      selections
+    };
+
+    const token=localStorage.getItem(SESSION_KEY);
+
+    busy(true);
+
+    try{
+      const res=await gas('saveBlock',token,payload);
+
+      if(!res.ok){
+        return toast(res.message,'err');
+      }
+
+      toast(res.message,'ok');
+
+      await refreshBlocksCache();
+      closeBlockModal();
+      await loadAvailability();
+
+    }catch(err){
+      toast(errorText(err),'err');
+
+    }finally{
+      busy(false);
+    }
+  }
+
+  async function submitCancelBlock(){
+    const id=document.getElementById('existingBlockSelect').value;
+    const b=blocksCache.find(x=>x.id===id);
+
+    if(!b){
+      return toast('Selecciona el bloqueo que deseas cancelar.','err');
+    }
+
+    if(!confirm(`¿Cancelar el bloqueo "${b.evento}"?`)){
+      return;
+    }
+
+    const token=localStorage.getItem(SESSION_KEY);
+
+    busy(true);
+
+    try{
+      const res=await gas('cancelBlock',token,id);
+
+      if(!res.ok){
+        return toast(res.message,'err');
+      }
+
+      toast(res.message,'ok');
+
+      await refreshBlocksCache();
+      closeBlockModal();
+      await loadAvailability();
+
+    }catch(err){
+      toast(errorText(err),'err');
+
+    }finally{
+      busy(false);
+    }
+  }
+
+
+  let serviceMode='new';
+  let serviceBlocksCache=[];
+  let serviceEditingId='';
+  let serviceSelections=new Set();
+
+  async function openServiceModal(){
+    if(!currentUser || currentUser.tipo!=='administrador') return toast('Esta opción es exclusiva para Administradores.','err');
+    document.getElementById('serviceModal').classList.remove('hidden');
+    await refreshServiceBlocks();
+    setServiceMode('new');
+  }
+  function closeServiceModal(){document.getElementById('serviceModal').classList.add('hidden')}
+  function serviceBackdropClick(e){if(e.target.id==='serviceModal') closeServiceModal()}
+
+  async function refreshServiceBlocks(){
+    const res=await gas('getOutOfServiceBlocks',localStorage.getItem(SESSION_KEY));
+    if(!res.ok) throw new Error(res.message);
+    serviceBlocksCache=res.blocks||[];
+  }
+
+  function serviceStartsInSelectedMonth(b){return blockStartsInSelectedMonth(b)}
+
+  function fillServicePicker(){
+    const sel=document.getElementById('svcExistingSelect');
+    const period=selectedChartPeriod(); const monthName=MONTHS[period.month-1]||'Mes';
+    const list=serviceMode==='edit' ? serviceBlocksCache.filter(serviceStartsInSelectedMonth) : serviceBlocksCache.slice();
+    document.getElementById('svcPickerLabel').textContent=serviceMode==='edit' ? `SELECCIONA FUERA DE SERVICIO DE ${monthName.toUpperCase()} ${period.year}` : 'SELECCIONA UN FUERA DE SERVICIO';
+    const opts=[`<option value="">Selecciona un registro...</option>`];
+    list.forEach(b=>opts.push(`<option value="${escapeAttr(b.id)}" style="background:#111827;color:#fff;font-weight:700;">${escapeHtml(b.evento)} · ${escapeHtml(b.fechaEntrada)} a ${escapeHtml(b.fechaSalida)} · FUERA DE SERVICIO</option>`));
+    sel.innerHTML=opts.join('');
+    document.getElementById('svcExistingSummary').classList.add('hidden');
+  }
+
+  function setServiceMode(mode){
+    serviceMode=mode; serviceEditingId=''; serviceSelections=new Set();
+    ['new','edit','cancel','report'].forEach(m=>document.getElementById('svcMode'+m.charAt(0).toUpperCase()+m.slice(1)+'Btn').classList.toggle('active',m===mode));
+    document.getElementById('svcPicker').classList.toggle('hidden',mode==='new'||mode==='report');
+    document.getElementById('svcEditor').classList.toggle('hidden',mode==='cancel'||mode==='report');
+    document.getElementById('svcCancelPanel').classList.toggle('hidden',mode!=='cancel');
+    document.getElementById('svcReportPanel').classList.toggle('hidden',mode!=='report');
+    document.getElementById('svcSelectionWrap').classList.add('hidden');
+    document.getElementById('svcSelectionGrid').innerHTML='';
+    if(mode==='report'){loadServiceCancelledReport();return;}
+    if(mode==='new'){
+      const todayIso=localIso(new Date()); const period=selectedChartPeriod();
+      const first=`${period.year}-${String(period.month).padStart(2,'0')}-01`; const d=first<todayIso?todayIso:first;
+      document.getElementById('svcEvent').value=''; document.getElementById('svcStart').min=todayIso; document.getElementById('svcEnd').min=todayIso;
+      document.getElementById('svcStart').value=d; document.getElementById('svcEnd').value=d;
+      document.getElementById('svcSaveBtn').textContent='Guardar fuera de servicio';
+    }else{
+      fillServicePicker(); document.getElementById('svcStart').removeAttribute('min'); document.getElementById('svcEnd').removeAttribute('min');
+      document.getElementById('svcSaveBtn').textContent='Guardar modificaciones';
+    }
+  }
+
+  async function serviceExistingChanged(){
+    const id=document.getElementById('svcExistingSelect').value; const b=serviceBlocksCache.find(x=>x.id===id); const summary=document.getElementById('svcExistingSummary');
+    if(!b){serviceEditingId='';summary.classList.add('hidden');return;}
+    summary.innerHTML=`<strong>${escapeHtml(b.evento)}</strong><br>${escapeHtml(b.fechaEntrada)} a ${escapeHtml(b.fechaSalida)} · FUERA DE SERVICIO<br>${(b.selections||[]).length} selección(es) de salón/fecha`;
+    summary.classList.remove('hidden'); serviceEditingId=b.id;
+    if(serviceMode==='cancel'){document.getElementById('svcCancelText').innerHTML=`Vas a cancelar <strong>${escapeHtml(b.evento)}</strong>.`;return;}
+    document.getElementById('svcEvent').value=b.evento||''; document.getElementById('svcStart').value=b.fechaEntrada||''; document.getElementById('svcEnd').value=b.fechaSalida||'';
+    document.getElementById('svcStart').removeAttribute('min'); document.getElementById('svcEnd').removeAttribute('min');
+    serviceSelections=new Set((b.selections||[]).map(s=>selectionKey(s.salon,s.date)));
+    await buildServiceGrid(true);
+  }
+
+  function serviceDatesChanged(){
+    const s=v('svcStart'),e=v('svcEnd'); if(s&&e&&s>e) document.getElementById('svcEnd').value=s;
+    document.getElementById('svcSelectionWrap').classList.add('hidden'); document.getElementById('svcSelectionGrid').innerHTML='';
+    if(serviceMode==='new') serviceSelections=new Set();
+  }
+
+  async function buildServiceGrid(preserve=false){
+    const start=v('svcStart'),end=v('svcEnd'); if(!start||!end) return toast('Selecciona fecha de entrada y salida.','err'); if(start>end) return toast('La fecha de salida no puede ser anterior a la de entrada.','err');
+    busy(true); try{
+      const res=await gas('getOutOfServiceGrid',localStorage.getItem(SESSION_KEY),start,end,serviceMode==='edit'?serviceEditingId:'');
+      if(!res.ok) return toast(res.message,'err'); if(!preserve) serviceSelections=new Set(); renderServiceGrid(res); document.getElementById('svcSelectionWrap').classList.remove('hidden');
+    }catch(err){toast(errorText(err),'err')}finally{busy(false)}
+  }
+
+  function renderServiceGrid(data){
+    let html='<table class="selection-table"><thead><tr><th class="room">SALÓN</th>';
+    data.dates.forEach(d=>{const dt=parseLocalIso(d);html+=`<th>${dt.getDate()}<br><span style="font-weight:500">${escapeHtml(MONTHS[dt.getMonth()].slice(0,3))}</span></th>`}); html+='</tr></thead><tbody>';
+    data.rows.forEach(row=>{html+=`<tr><td class="room">${escapeHtml(row.salon)}</td>`; row.cells.forEach(c=>{const key=selectionKey(row.salon,c.date),selected=serviceSelections.has(key),cls=c.available?'pickcell'+(selected?' selected':''):'pickcell unavailable'; html+=`<td class="${cls}" title="${escapeAttr(c.available?'Disponible':statusLabel(c.status)+(c.detail?' · '+c.detail:''))}">`; if(c.available){html+=`<input type="checkbox" ${selected?'checked':''} onchange="toggleServiceSelection(this,'${escapeJs(row.salon)}','${c.date}')">`}else{html+=`<span class="pick-status">${escapeHtml(statusLabel(c.status).slice(0,4))}</span>`} html+='</td>'}); html+='</tr>'}); html+='</tbody></table>'; document.getElementById('svcSelectionGrid').innerHTML=html;
+  }
+  function toggleServiceSelection(input,salon,date){const key=selectionKey(salon,date); if(input.checked)serviceSelections.add(key);else serviceSelections.delete(key);input.closest('td').classList.toggle('selected',input.checked)}
+
+  async function submitServiceBlock(){
+    if(serviceMode==='edit'&&!serviceEditingId)return toast('Selecciona el fuera de servicio que deseas modificar.','err');
+    const evento=v('svcEvent'),fechaEntrada=v('svcStart'),fechaSalida=v('svcEnd'); if(!evento||!fechaEntrada||!fechaSalida)return toast('Completa nombre/motivo y fechas.','err'); if(fechaEntrada>fechaSalida)return toast('La fecha de salida no puede ser anterior a la de entrada.','err'); if(!serviceSelections.size)return toast('Selecciona al menos una fecha de algún salón.','err');
+    const selections=[...serviceSelections].map(k=>{const pos=k.lastIndexOf('|');return{salon:k.slice(0,pos),date:k.slice(pos+1)}});
+    busy(true);try{const res=await gas('saveOutOfServiceBlock',localStorage.getItem(SESSION_KEY),{id:serviceMode==='edit'?serviceEditingId:'',evento,fechaEntrada,fechaSalida,status:'out_of_service',selections}); if(!res.ok)return toast(res.message,'err'); toast(res.message,'ok'); await refreshServiceBlocks(); closeServiceModal(); await loadAvailability()}catch(err){toast(errorText(err),'err')}finally{busy(false)}
+  }
+
+  async function submitCancelServiceBlock(){
+    const id=document.getElementById('svcExistingSelect').value,b=serviceBlocksCache.find(x=>x.id===id); if(!b)return toast('Selecciona el fuera de servicio que deseas cancelar.','err'); if(!confirm(`¿Cancelar el fuera de servicio "${b.evento}"?`))return;
+    busy(true);try{const res=await gas('cancelOutOfServiceBlock',localStorage.getItem(SESSION_KEY),id); if(!res.ok)return toast(res.message,'err'); toast(res.message,'ok'); await refreshServiceBlocks(); closeServiceModal(); await loadAvailability()}catch(err){toast(errorText(err),'err')}finally{busy(false)}
+  }
+
+  async function loadServiceCancelledReport(){
+    const p=selectedChartPeriod(),monthName=MONTHS[p.month-1]||'Mes'; document.getElementById('svcReportTitle').textContent=`Reporte Fuera de Servicio cancelados · ${monthName} ${p.year}`; const box=document.getElementById('svcReportContent'); box.innerHTML='<div class="report-empty"><strong>Cargando reporte...</strong></div>';
+    try{const res=await gas('getOutOfServiceCancelledReport',localStorage.getItem(SESSION_KEY),p.year,p.month); if(!res.ok)throw new Error(res.message); const rows=res.rows||[]; if(!rows.length){box.innerHTML='<div class="report-empty"><strong>Sin registros cancelados</strong>No hay fuera de servicio cancelados en el mes seleccionado.</div>';return;} let h='<table class="report-table"><thead><tr><th>Motivo</th><th>Entrada</th><th>Salida</th><th>Status</th><th>Salones / fechas</th><th>Cancelado por</th><th>Motivo cancelación</th><th>Fecha cancelación</th></tr></thead><tbody>'; rows.forEach(r=>{const sels=(r.selections||[]).map(s=>`${s.salon} · ${s.date}`).join(', ');h+=`<tr><td><strong>${escapeHtml(r.evento)}</strong></td><td>${escapeHtml(r.fechaEntrada)}</td><td>${escapeHtml(r.fechaSalida)}</td><td><span class="report-status out_of_service">FUERA DE SERVICIO</span></td><td>${escapeHtml(sels||'—')}</td><td>${escapeHtml(r.canceladoPor||'—')}</td><td>${escapeHtml(r.motivo||'—')}</td><td>${escapeHtml(r.fechaHoraCancelacion||'—')}</td></tr>`}); box.innerHTML=h+'</tbody></table>';}catch(err){box.innerHTML=`<div class="report-empty"><strong>Error</strong>${escapeHtml(errorText(err))}</div>`}
+  }
+
+  function selectionKey(salon,date){
+    return `${salon}|${date}`;
+  }
+
+  function localIso(d){
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function parseLocalIso(s){
+    const [y,m,d]=s.split('-').map(Number);
+    return new Date(y,m-1,d);
+  }
+
+  function escapeJs(s){
+    return String(s??'')
+      .replace(/\\/g,'\\\\')
+      .replace(/'/g,"\\'")
+      .replace(/\r?\n/g,' ');
+  }
+
+
+  function statusLabel(s){return ({available:'Disponible',occupied:'Ocupado',tentative:'Tentativo',guaranteed:'Garantizado',out_of_service:'Fuera de Servicio'})[s]||s}
+  function capitalize(s){s=String(s||'').toLowerCase();return s.charAt(0).toUpperCase()+s.slice(1)}
+  function setText(id,val){document.getElementById(id).textContent=val}
+  function v(id){return document.getElementById(id).value.trim()}
+  function busy(on){document.getElementById('overlay').classList.toggle('hidden',!on)}
+  function toast(msg,type=''){const w=document.getElementById('toasts');const d=document.createElement('div');d.className='toast '+type;d.textContent=msg;w.appendChild(d);setTimeout(()=>d.remove(),4200)}
+  function errorText(e){return (e&&e.message)?e.message:'Ocurrió un error inesperado.'}
+  function escapeHtml(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+  function escapeAttr(s){return escapeHtml(s).replace(/'/g,'&#039;')}
+  function gas(fn,...args){return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[fn](...args))}
+</script>
+</body>
+</html>
