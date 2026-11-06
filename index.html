@@ -735,7 +735,46 @@ function roomRender(){
  }).join('')+'</tr>').join('')+'</tbody>';
  document.getElementById('roomTable').innerHTML=html;
 }
-function roomPrint(){roomRender();document.body.classList.add('room-printing');window.print();setTimeout(()=>document.body.classList.remove('room-printing'),1000);}
+function roomPrint(){
+ // El PDF incluye todo el histórico cargado, independientemente de los filtros de pantalla.
+ const heads=['GRUPO','IN','OUT',...ROOM_KEYS,'TOTAL','ESTADO','VENDEDOR','FECHA LÍMITE','CTA. ZUGACLOUD','AUTORIZADO POR'];
+ const fields=['Nombre del Grupo','Fecha de entrada','Fecha de salida',...ROOM_KEYS,'Total','Status','Vendedor','Fecha limite','Cta. Zugacloud','Autorizado por'];
+ const fmt=v=>{const s=String(v??'');return /^\d{4}-\d{2}-\d{2}$/.test(s)?s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4):s;};
+ const now=new Date(),today=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');
+ const groups=new Map();
+ for(const r of roomRecords){
+   const date=String(r['Fecha de entrada']||'');
+   const match=/^(\d{4})-(\d{2})/.exec(date);
+   const key=match?match[1]+'-'+match[2]:'Sin fecha';
+   if(!groups.has(key))groups.set(key,[]);
+   groups.get(key).push(r);
+ }
+ const keys=[...groups.keys()].sort((a,b)=>a==='Sin fecha'?1:b==='Sin fecha'?-1:a.localeCompare(b));
+ const sections=keys.map(key=>{
+   const records=groups.get(key).slice().sort((a,b)=>String(a['Fecha de entrada']||'').localeCompare(String(b['Fecha de entrada']||'')));
+   const match=/^(\d{4})-(\d{2})$/.exec(key);
+   const monthTitle=match?MONTHS[Number(match[2])-1]+' '+match[1]:'Sin fecha de entrada';
+   const total=records.reduce((n,r)=>n+ROOM_KEYS.reduce((a,k)=>a+(Number(r[k])||0),0),0);
+   const rows=records.map(r=>'<tr>'+fields.map((f,i)=>{
+     let v=f==='Total'?String(ROOM_KEYS.reduce((n,k)=>n+(Number(r[k])||0),0)):String(r[f]??'');
+     if(ROOM_KEYS.includes(f)&&Number(v)===0)v='';
+     if(['Fecha de entrada','Fecha de salida','Fecha limite'].includes(f))v=fmt(v);
+     let cls=i===0?'group ':'';
+     if(f==='Status')cls+=String(r.Status||'').toLowerCase()==='definitivo'?'def':'ten';
+     if(f==='Fecha limite'&&/^\d{4}-\d{2}-\d{2}$/.test(String(r[f]||''))&&String(r[f])<=today)cls+=' due';
+     return '<td class="'+cls+'">'+roomEsc(v)+'</td>';
+   }).join('')+'</tr>').join('');
+   return '<section class="month"><h2>'+roomEsc(monthTitle)+'</h2><p>'+records.length+' grupos · '+total+' habitaciones</p><table><colgroup><col class="groupcol"><col span="2" class="datecol"><col span="'+ROOM_KEYS.length+'" class="numcol"><col class="numcol"><col class="statuscol"><col span="4" class="endcol"></colgroup><thead><tr>'+heads.map(h=>'<th>'+roomEsc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table></section>';
+ }).join('');
+ const printWin=window.open('','_blank');
+ if(!printWin){toast('Permite las ventanas emergentes para exportar el PDF.','err');return;}
+ const style=`@page{size:A3 landscape;margin:5mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{margin:0;padding:0;font-family:Arial,sans-serif;color:#111}body{padding:0}h1{font-size:17px;text-align:center;margin:0 0 9px}h2{font-size:13px;margin:5px 0}p{font-size:10px;margin:0 0 8px}.month{break-before:page;page-break-before:always;width:100%}.month:first-of-type{break-before:auto;page-break-before:auto}table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:7px}col.groupcol{width:12%}col.datecol{width:5%}col.numcol{width:2.45%}col.statuscol{width:5%}col.endcol{width:5.5%}th,td{border:0.5px solid #aeb6bd;padding:4px 1px;text-align:center;vertical-align:middle;overflow-wrap:anywhere;word-break:normal}th{background:#008c49!important;color:white!important;font-size:6.5px;line-height:1.2}td.group{text-align:left;font-weight:bold}td.def{background:#f11!important;color:#fff!important;font-weight:bold}td.ten{background:#ffe34c!important;color:#111!important;font-weight:bold}td.due{background:#39ff14!important;color:#072600!important;font-weight:bold}tr{break-inside:avoid;page-break-inside:avoid}thead{display:table-header-group}@media screen{body{padding:16px}.month{margin-bottom:35px;border-bottom:1px solid #ccc;padding-bottom:20px}}`;
+ printWin.document.open();
+ printWin.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Reporte general de bloqueos de habitaciones</title><style>'+style+'</style></head><body><h1>GRUPO DORADOS — REPORTE GENERAL DE BLOQUEOS DE HABITACIONES</h1>'+(sections||'<p>No hay bloqueos registrados.</p>')+'</body></html>');
+ printWin.document.close();
+ printWin.focus();
+ setTimeout(()=>printWin.print(),350);
+}
 window.addEventListener('afterprint',()=>document.body.classList.remove('room-printing'));
 
   const RESET_TOKEN = new URLSearchParams(window.location.search).get('reset') || '';
