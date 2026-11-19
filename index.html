@@ -681,7 +681,8 @@
   <p style="font-size:12px;color:#71667d">Fechas límite desde hoy hasta los próximos 3 días.</p>
   <div id="deadlineAlertContent"></div>
 </div>
-\n<div id="overlay" class="overlay hidden"><div class="spinner"></div></div>
+
+<div id="overlay" class="overlay hidden"><div class="spinner"></div></div>
 <div id="toasts" class="toast-wrap"></div>
 
 <script>
@@ -818,7 +819,8 @@
     }catch(e){console.error('Alertas de bloqueos:',e);}
     finally{deadlineRequestInFlight=false;}
   }
-\n  async function enterApp(user){
+
+  async function enterApp(user){
     currentUser=user;
     document.getElementById('authView').classList.add('hidden');
     document.getElementById('appView').classList.remove('hidden');
@@ -950,7 +952,8 @@
     }catch(err){toast(errorText(err),'err')}finally{busy(false)}
   }
 
-  async function logout(){\n    stopDeadlineAlerts();
+  async function logout(){
+    stopDeadlineAlerts();
     const token=localStorage.getItem(SESSION_KEY);
     busy(true);
     try{
