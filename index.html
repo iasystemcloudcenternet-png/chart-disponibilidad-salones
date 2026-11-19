@@ -789,44 +789,7 @@ function roomPrint(){
  if(!printWin){toast('Permite las ventanas emergentes para exportar el PDF.','err');return;}
  const style=`@page{size:A3 landscape;margin:5mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{margin:0;padding:0;font-family:Arial,sans-serif;color:#111}body{padding:0}h1{font-size:17px;text-align:center;margin:0 0 9px}h2{font-size:13px;margin:5px 0}p{font-size:10px;margin:0 0 8px}.month{break-before:page;page-break-before:always;width:100%}.month:first-of-type{break-before:auto;page-break-before:auto}table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:7px}col.groupcol{width:12%}col.datecol{width:5%}col.numcol{width:2.45%}col.statuscol{width:5%}col.endcol{width:5.5%}th,td{border:0.5px solid #aeb6bd;padding:4px 1px;text-align:center;vertical-align:middle;overflow-wrap:anywhere;word-break:normal}th{background:#008c49!important;color:white!important;font-size:6.5px;line-height:1.2}td.group{text-align:left;font-weight:bold}td.def{background:#f11!important;color:#fff!important;font-weight:bold}td.ten{background:#ffe34c!important;color:#111!important;font-weight:bold}td.due{background:#39ff14!important;color:#072600!important;font-weight:bold}tr{break-inside:avoid;page-break-inside:avoid}thead{display:table-header-group}@media screen{body{padding:16px}.month{margin-bottom:35px;border-bottom:1px solid #ccc;padding-bottom:20px}}`;
  printWin.document.open();
- printWin.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Reporte general de bloqueos de habitaciones</title><style>'+style+'</style></head><body><h1>GRUPO DORADOS — REPORTE GENERAL DE BLOQUEOS DE HABITACIONES</h1>'+(sections||'<p>No hay bloqueos registrados.</p>')+'
-<div id="deadlineAlert" class="hidden" role="dialog" aria-label="Bloqueos próximos a vencer">
-  <div class="deadline-top"><span class="deadline-sun" aria-hidden="true">🌞</span><strong>Bloqueos próximos a vencer</strong><button type="button" class="deadline-close" onclick="closeDeadlineAlert()" aria-label="Cerrar">×</button></div>
-  <div id="deadlineAlertBody" class="deadline-body"></div>
-</div>
-
-<script>
-let deadlineAlertTimer=null;
-let deadlineAlertRunning=false;
-function deadlineEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function closeDeadlineAlert(){document.getElementById('deadlineAlert')?.classList.add('hidden');}
-function stopDeadlineAlerts(){if(deadlineAlertTimer)clearInterval(deadlineAlertTimer);deadlineAlertTimer=null;closeDeadlineAlert();}
-function startDeadlineAlerts(){
-  stopDeadlineAlerts();
-  checkDeadlineAlerts();
-  deadlineAlertTimer=setInterval(checkDeadlineAlerts,4*60*1000);
-}
-async function checkDeadlineAlerts(){
-  if(deadlineAlertRunning || !currentUser)return;
-  const token=localStorage.getItem(SESSION_KEY);
-  if(!token)return;
-  deadlineAlertRunning=true;
-  try{
-    const data=await gas('getUpcomingDeadlineAlerts',token);
-    if(!data?.ok)throw Error(data?.message||'No se pudieron consultar las alertas');
-    const salons=data.salones||[],rooms=data.habitaciones||[];
-    if(!salons.length&&!rooms.length){closeDeadlineAlert();return;}
-    const makeItems=(items,role)=>items.map(x=>`<div class="deadline-item"><b>${deadlineEsc(x.nombre)}</b>${role}: ${deadlineEsc(x.responsable)}<div class="deadline-date">Fecha límite: ${deadlineEsc(x.fechaLimite)}</div></div>`).join('');
-    document.getElementById('deadlineAlertBody').innerHTML=
-      `<p style="font-size:12px;margin:0">Seguimiento informativo de vencimientos entre hoy y los próximos 3 días.</p>`+
-      (salons.length?`<h4>🏛️ Salones (${salons.length})</h4>${makeItems(salons,'Usuario')}`:'')+
-      (rooms.length?`<h4>🛏️ Habitaciones (${rooms.length})</h4>${makeItems(rooms,'Vendedor')}`:'');
-    if(currentUser)document.getElementById('deadlineAlert').classList.remove('hidden');
-  }catch(e){console.warn('Alertas de vencimiento:',e);}
-  finally{deadlineAlertRunning=false;}
-}
-</script>
-</body></html>');
+ printWin.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Reporte general de bloqueos de habitaciones</title><style>'+style+'</style></head><body><h1>GRUPO DORADOS — REPORTE GENERAL DE BLOQUEOS DE HABITACIONES</h1>'+(sections||'<p>No hay bloqueos registrados.</p>')+'</body></html>');
  printWin.document.close();
  printWin.focus();
  setTimeout(()=>printWin.print(),350);
@@ -2539,6 +2502,37 @@ window.addEventListener('afterprint',()=>document.body.classList.remove('room-pr
   function capitalize(s){s=String(s||'').toLowerCase();return s.charAt(0).toUpperCase()+s.slice(1)}
   function setText(id,val){document.getElementById(id).textContent=val}
   function v(id){return document.getElementById(id).value.trim()}
+
+let deadlineAlertTimer=null;
+let deadlineAlertRunning=false;
+function deadlineEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function closeDeadlineAlert(){document.getElementById('deadlineAlert')?.classList.add('hidden');}
+function stopDeadlineAlerts(){if(deadlineAlertTimer)clearInterval(deadlineAlertTimer);deadlineAlertTimer=null;closeDeadlineAlert();}
+function startDeadlineAlerts(){
+  stopDeadlineAlerts();
+  checkDeadlineAlerts();
+  deadlineAlertTimer=setInterval(checkDeadlineAlerts,4*60*1000);
+}
+async function checkDeadlineAlerts(){
+  if(deadlineAlertRunning || !currentUser)return;
+  const token=localStorage.getItem(SESSION_KEY);
+  if(!token)return;
+  deadlineAlertRunning=true;
+  try{
+    const data=await gas('getUpcomingDeadlineAlerts',token);
+    if(!data?.ok)throw Error(data?.message||'No se pudieron consultar las alertas');
+    const salons=data.salones||[],rooms=data.habitaciones||[];
+    if(!salons.length&&!rooms.length){closeDeadlineAlert();return;}
+    const makeItems=(items,role)=>items.map(x=>`<div class="deadline-item"><b>${deadlineEsc(x.nombre)}</b>${role}: ${deadlineEsc(x.responsable)}<div class="deadline-date">Fecha límite: ${deadlineEsc(x.fechaLimite)}</div></div>`).join('');
+    document.getElementById('deadlineAlertBody').innerHTML=
+      `<p style="font-size:12px;margin:0">Seguimiento informativo de vencimientos entre hoy y los próximos 3 días.</p>`+
+      (salons.length?`<h4>🏛️ Salones (${salons.length})</h4>${makeItems(salons,'Usuario')}`:'')+
+      (rooms.length?`<h4>🛏️ Habitaciones (${rooms.length})</h4>${makeItems(rooms,'Vendedor')}`:'');
+    if(currentUser)document.getElementById('deadlineAlert').classList.remove('hidden');
+  }catch(e){console.warn('Alertas de vencimiento:',e);}
+  finally{deadlineAlertRunning=false;}
+}
+
   function busy(on){document.getElementById('overlay').classList.toggle('hidden',!on)}
   function toast(msg,type=''){const w=document.getElementById('toasts');const d=document.createElement('div');d.className='toast '+type;d.textContent=msg;w.appendChild(d);setTimeout(()=>d.remove(),4200)}
   function errorText(e){return (e&&e.message)?e.message:'Ocurrió un error inesperado.'}
@@ -2572,5 +2566,11 @@ window.addEventListener('afterprint',()=>document.body.classList.remove('room-pr
 </script>
   
   
+
+<div id="deadlineAlert" class="hidden" role="dialog" aria-label="Bloqueos próximos a vencer">
+  <div class="deadline-top"><span class="deadline-sun" aria-hidden="true">🌞</span><strong>Bloqueos próximos a vencer</strong><button type="button" class="deadline-close" onclick="closeDeadlineAlert()" aria-label="Cerrar">×</button></div>
+  <div id="deadlineAlertBody" class="deadline-body"></div>
+</div>
+
 </body>
 </html>
