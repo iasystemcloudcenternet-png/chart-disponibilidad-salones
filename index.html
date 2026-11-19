@@ -1,22 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Disponibilidad de Salones | Grupo Dorados</title>
-  <!-- Configuración PWA -->
-  <meta name="theme-color" content="#6d28d9">
-  <meta name="application-name" content="Disponibilidad de Salones">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Grupo Dorados">
-
-  <link rel="manifest" href="/manifest.json">
-  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">
-  
+  <title><?= appName ?></title>
   <style>
     :root{
       --violet:#6d28d9;
@@ -250,7 +239,6 @@
     .add-user-card{width:min(500px,94vw);background:#fff;border-radius:22px;padding:24px;box-shadow:0 24px 75px rgba(30,18,43,.32);border:1px solid #eadff6}.add-user-card h3{margin:0 0 6px;color:#7d2456}.add-user-card p{margin:0 0 18px;color:#786b75;font-size:13px}.add-user-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}.add-user-actions .btn{width:auto}
     @media(max-width:850px){.account-grid{grid-template-columns:1fr}.account-profile{min-height:230px}.users-head{align-items:flex-start;flex-direction:column}}
   </style>
-<style>.room-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin:12px 0}.room-grid label,#roomEditor>label,#roomReport label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}.room-grid input,.room-grid select,#roomExisting,#roomReport select{width:100%;padding:9px;border:1px solid #d7d1e1;border-radius:8px}.room-table{border-collapse:collapse;width:100%;font-size:11px}.room-table th,.room-table td{border:1px solid #bfc4ca;padding:6px;white-space:nowrap}.room-table th{background:#008b4a;color:white}.room-def{background:#f43f46;color:white;font-weight:bold}.room-ten{background:#ffe45c;color:#392800;font-weight:bold}.room-over{background:#ffd3d3;color:#a10000;font-weight:bold}@media print{body.room-printing>*:not(#roomModal){display:none!important}body.room-printing #roomModal{position:static!important;display:block!important;background:white!important;padding:0!important}body.room-printing #roomModal>.modal{max-width:none!important;max-height:none!important;overflow:visible!important;box-shadow:none!important;padding:0!important}body.room-printing #roomModal button,body.room-printing #roomEditor,body.room-printing #roomReport>div:first-child{display:none!important}body.room-printing #roomReport{display:block!important}body.room-printing .room-table{font-size:8px}body.room-printing .room-table th,body.room-printing .room-table td{padding:3px}@page{size:A3 landscape;margin:8mm}}.room-table{width:max-content;min-width:100%;font-size:10px}.room-table th{background:#00ae53;color:#081b11;font-weight:800;text-align:center}.room-table td{text-align:center;min-width:42px}.room-table .room-group{text-align:left;font-weight:700;min-width:240px}.room-table .room-def{background:#ed1111!important;color:white!important}.room-table .room-ten{background:#ffe34c!important;color:#161616!important}.room-table .room-over{background:#ffcece!important;color:#950000!important}@media print{.room-table{width:100%;min-width:0;font-size:6px;table-layout:auto}.room-table th,.room-table td{padding:2px!important;min-width:0!important;white-space:normal;overflow-wrap:anywhere}.room-table .room-group{min-width:0!important;width:100px}body.room-printing #roomPrintable>div{overflow:visible!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style>
 </head>
 <body>
 <div class="app-shell">
@@ -349,9 +337,6 @@
           <button id="serviceButton" class="btn btn-service hidden" onclick="openServiceModal()">⚫ Fuera de Servicio</button>
           <button class="btn btn-dashboard" onclick="openDashboard()">▥ Dashboard</button>
           <button class="btn btn-report-main" onclick="openSystemReport()">▤ Reporte</button>
-          <div style="flex-basis:100%;height:0"></div>
-          <button id="roomAdminButton" class="btn hidden" style="background:#a56a25;color:white" onclick="roomOpen(true)">▣ Agregar Bloqueo Habitacion</button>
-          <button class="btn" style="background:#17659b;color:white" onclick="roomOpen(false)">▤ Reporte de bloqueos recibidos</button>
           <button class="btn btn-ghost" onclick="loadAvailability()">↻ <span>Actualizar</span></button>
         </div>
       </div>
@@ -679,108 +664,27 @@
   </div>
 </div>
 
-<div id="overlay" class="overlay hidden"><div class="spinner"></div></div>
-<div id="toasts" class="toast-wrap"></div>
 
 <style>
-/* Ajustes de visualización del reporte de bloqueos de habitaciones */
-#roomModal>.modal{box-sizing:border-box;overscroll-behavior:contain}
-#roomReport{padding-bottom:22px}
-#roomPrintable{padding-bottom:16px}
-.room-table-scroll{width:100%;max-width:100%;overflow-x:auto;overflow-y:visible;padding-bottom:18px;scrollbar-gutter:stable}
-@keyframes roomDeadlinePulse{0%,100%{background-color:#39ff14;color:#052b00;box-shadow:inset 0 0 0 2px #16a000}50%{background-color:#edffeb;color:#164b0b;box-shadow:inset 0 0 0 1px #b2ff9c}}
-#roomTable td.room-over{animation:roomDeadlinePulse 1.15s steps(1,end) infinite!important;font-weight:900!important}
-@media(prefers-reduced-motion:reduce){#roomTable td.room-over{animation:none!important;background:#39ff14!important;color:#052b00!important}}
-@media print{#roomTable td.room-over{animation:none!important;background:#39ff14!important;color:#052b00!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.room-table-scroll{overflow:visible!important;padding:0!important}#roomReport,#roomPrintable{padding:0!important}}
+#deadlineAlert{position:fixed;right:18px;bottom:18px;z-index:310;width:min(440px,calc(100vw - 24px));max-height:min(76vh,660px);overflow:auto;background:#fff;border:3px solid #ffad25;border-radius:19px;box-shadow:0 15px 50px #442b3550;padding:17px;color:#261d31}
+#deadlineAlert .alert-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#deadlineAlert .alert-sun{display:inline-block;font-size:53px;animation:deadlineDance .75s ease-in-out infinite alternate;transform-origin:50% 85%}
+@keyframes deadlineDance{from{transform:rotate(-18deg) translateY(3px)}to{transform:rotate(18deg) translateY(-7px)}}
+#deadlineAlert h3{font-size:17px;margin:0}#deadlineAlert h4{font-size:13px;margin:16px 0 7px;color:#6d28d9}
+#deadlineAlert .alert-item{border:1px solid #eee2fa;border-radius:10px;padding:9px 11px;margin:6px 0;font-size:12px;line-height:1.5;background:#fcfaff}
+#deadlineAlert .alert-item strong{display:block;font-size:13px}
+#deadlineAlert .alert-close{border:0;background:#f1edf7;border-radius:9px;cursor:pointer;padding:8px 12px}
+@media(prefers-reduced-motion:reduce){#deadlineAlert .alert-sun{animation:none}}
 </style>
-<div id="roomModal" class="modal-backdrop hidden" onclick="if(event.target===this)roomClose()"><div class="modal" style="max-width:1500px;width:calc(100vw - 20px);max-height:calc(100dvh - 20px);overflow:auto;padding:22px 22px 38px;background:white" role="dialog" aria-modal="true"><div style="display:flex;justify-content:space-between;align-items:center"><h2 id="roomTitle">Bloqueos de habitaciones</h2><button class="btn" onclick="roomClose()">Cerrar ×</button></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px"><button id="roomNewButton" class="btn" onclick="roomMode(true)">Nuevo bloqueo</button><button class="btn" onclick="roomMode(false)">Reporte de bloqueos recibidos</button><button class="btn" onclick="roomPrint()">Exportar a PDF</button></div><div id="roomEditor" class="hidden"><label>Seleccionar bloqueo para modificar o eliminar<select id="roomExisting" onchange="roomSelect()"></select></label><form id="roomForm" onsubmit="roomSubmit(event)"><input type="hidden" name="ID"><div class="room-grid"><label>Nombre del Grupo<input name="Nombre del Grupo" required></label><label>Fecha de entrada<input name="Fecha de entrada" type="date" required></label><label>Fecha de salida<input name="Fecha de salida" type="date" required></label></div><h3>Habitaciones por categoría</h3><div class="room-grid"><label>BUDK<input type="number" min="0" step="1" name="BUDK" value="0" required></label><label>BUDI<input type="number" min="0" step="1" name="BUDI" value="0" required></label><label>BUCI<input type="number" min="0" step="1" name="BUCI" value="0" required></label><label>ACOL<input type="number" min="0" step="1" name="ACOL" value="0" required></label><label>ACTI<input type="number" min="0" step="1" name="ACTI" value="0" required></label><label>TUCI<input type="number" min="0" step="1" name="TUCI" value="0" required></label><label>PADI<input type="number" min="0" step="1" name="PADI" value="0" required></label><label>PATI<input type="number" min="0" step="1" name="PATI" value="0" required></label><label>PACI<input type="number" min="0" step="1" name="PACI" value="0" required></label><label>PASI<input type="number" min="0" step="1" name="PASI" value="0" required></label><label>PASC<input type="number" min="0" step="1" name="PASC" value="0" required></label><label>TACM<input type="number" min="0" step="1" name="TACM" value="0" required></label><label>TADK<input type="number" min="0" step="1" name="TADK" value="0" required></label><label>CECK<input type="number" min="0" step="1" name="CECK" value="0" required></label><label>MADK<input type="number" min="0" step="1" name="MADK" value="0" required></label><label>VISK<input type="number" min="0" step="1" name="VISK" value="0" required></label><label>LACK<input type="number" min="0" step="1" name="LACK" value="0" required></label><label>LACI<input type="number" min="0" step="1" name="LACI" value="0" required></label></div><div class="room-grid"><label>Status<select name="Status"><option>Tentativo</option><option>Definitivo</option></select></label><label>Vendedor<input name="Vendedor"></label><label>Fecha limite<input name="Fecha limite" type="date"></label><label>Cta. Zugacloud<input name="Cta. Zugacloud"></label><label>Autorizado por<input name="Autorizado por"></label></div><p id="roomTotal">Total: 0 habitaciones</p><button class="btn" type="submit">Guardar bloqueo</button> <button class="btn btn-danger" type="button" onclick="roomRemove()">Eliminar bloqueo</button></form></div><div id="roomReport"><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"><label>Mes<select id="roomMonth" onchange="roomShowFiltered()"></select></label><label>Año<select id="roomYear" onchange="roomShowFiltered()"></select></label><button id="roomShowAllButton" class="btn" type="button" onclick="roomToggleAll()" style="align-self:end;background:#17659b;color:#fff">Ver todos</button></div><div id="roomPrintable"><h3>GRUPO DORADOS — REPORTE DE BLOQUEOS DE HABITACIONES</h3><div id="roomSummary"></div><div class="room-table-scroll"><table class="room-table" id="roomTable"></table></div></div></div></div></div>
+<div id="deadlineAlert" class="hidden" role="dialog" aria-label="Bloqueos próximos a vencer">
+  <div class="alert-top"><span class="alert-sun" aria-hidden="true">🌞</span><h3>Bloqueos próximos a vencer</h3><button class="alert-close" type="button" onclick="closeDeadlineAlert()" aria-label="Cerrar alerta">✕</button></div>
+  <p style="font-size:12px;color:#71667d">Fechas límite desde hoy hasta los próximos 3 días.</p>
+  <div id="deadlineAlertContent"></div>
+</div>
+\n<div id="overlay" class="overlay hidden"><div class="spinner"></div></div>
+<div id="toasts" class="toast-wrap"></div>
+
 <script>
-
-const ROOM_KEYS=['BUDK','BUDI','BUCI','ACOL','ACTI','TUCI','PADI','PATI','PACI','PASI','PASC','TACM','TADK','CECK','MADK','VISK','LACK','LACI'];
-let roomRecords=[];
-let roomShowAll=false;
-const roomEsc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-async function roomOpen(edit){
- if(edit&&currentUser?.tipo!=='administrador')return toast('Solo administradores.','err');
- document.getElementById('roomModal').classList.remove('hidden');
- const m=document.getElementById('roomMonth'),y=document.getElementById('roomYear');
- if(!m.options.length){MONTHS.forEach((n,i)=>m.add(new Option(n,i+1)));for(let n=2020;n<=new Date().getFullYear()+5;n++)y.add(new Option(n,n));}
- m.value=new Date().getMonth()+1;y.value=new Date().getFullYear();roomShowAll=false;roomUpdateAllButton();
- try{const r=await gas('roomList',localStorage.getItem(SESSION_KEY));if(!r.ok)throw Error(r.message);roomRecords=r.records||[];roomMode(edit);}catch(e){toast(e.message||String(e),'err');}
-}
-function roomClose(){document.getElementById('roomModal').classList.add('hidden');}
-function roomMode(edit){document.getElementById('roomNewButton').classList.toggle('hidden',!edit || currentUser?.tipo!=='administrador');document.getElementById('roomEditor').classList.toggle('hidden',!edit);document.getElementById('roomReport').classList.toggle('hidden',edit);if(edit){roomFillOptions();roomClear();}else roomRender();}
-function roomFillOptions(){const s=document.getElementById('roomExisting');s.innerHTML='<option value="">— Nuevo bloqueo —</option>'+roomRecords.map(r=>`<option value="${roomEsc(r.ID)}">${roomEsc(r['Nombre del Grupo'])} (${roomEsc(r['Fecha de entrada'])})</option>`).join('');}
-function roomClear(){document.getElementById('roomForm').reset();document.querySelector('#roomForm [name="ID"]').value='';roomTotal();}
-function roomSelect(){const id=document.getElementById('roomExisting').value;if(!id){roomClear();return;}const r=roomRecords.find(x=>x.ID===id);if(!r)return;const f=document.getElementById('roomForm');for(const el of f.elements)if(el.name&&r[el.name]!==undefined)el.value=r[el.name];roomTotal();}
-function roomTotal(){const f=document.getElementById('roomForm');document.getElementById('roomTotal').textContent='Total: '+ROOM_KEYS.reduce((a,k)=>a+(Number(f.elements.namedItem(k).value)||0),0)+' habitaciones';}
-document.addEventListener('input',e=>{if(e.target.closest('#roomForm'))roomTotal();});
-async function roomSubmit(e){e.preventDefault();if(currentUser?.tipo!=='administrador')return;const f=e.target;const d=Object.fromEntries(new FormData(f));for(const k of ROOM_KEYS){if(!/^\d+$/.test(String(d[k]||'')))return toast('Solo números enteros no negativos: '+k,'err');d[k]=Number(d[k]);}try{const r=await gas('roomSave',localStorage.getItem(SESSION_KEY),d);if(!r.ok)throw Error(r.message);toast('Bloqueo guardado correctamente','ok');await roomOpen(true);}catch(e){toast(e.message,'err');}}
-async function roomRemove(){const id=document.querySelector('#roomForm [name="ID"]').value;if(!id)return toast('Selecciona un bloqueo existente.','err');if(!confirm('¿Eliminar definitivamente este bloqueo de habitaciones?'))return;try{const r=await gas('roomDelete',localStorage.getItem(SESSION_KEY),id);if(!r.ok)throw Error(r.message);toast('Bloqueo eliminado','ok');await roomOpen(true);}catch(e){toast(e.message,'err');}}
-function roomUpdateAllButton(){const b=document.getElementById('roomShowAllButton');if(b){b.textContent=roomShowAll?'Ver mes y año':'Ver todos';b.setAttribute('aria-pressed',String(roomShowAll));}}
-function roomToggleAll(){roomShowAll=!roomShowAll;roomUpdateAllButton();roomRender();}
-function roomShowFiltered(){roomShowAll=false;roomUpdateAllButton();roomRender();}
-function roomRender(){
- const month=Number(document.getElementById('roomMonth').value),year=Number(document.getElementById('roomYear').value);
- const records=roomRecords.filter(r=>{if(roomShowAll)return true;const s=String(r['Fecha de entrada']||'');return Number(s.slice(0,4))===year&&Number(s.slice(5,7))===month;}).sort((a,b)=>String(a['Fecha de entrada']||'').localeCompare(String(b['Fecha de entrada']||'')));
- const heads=['GRUPO','IN','OUT',...ROOM_KEYS,'TOTAL','ESTADO','VENDEDOR','FECHA LÍMITE','CTA. ZUGACLOUD','AUTORIZADO POR'];
- const fields=['Nombre del Grupo','Fecha de entrada','Fecha de salida',...ROOM_KEYS,'Total','Status','Vendedor','Fecha limite','Cta. Zugacloud','Autorizado por'];
- const dateFmt=v=>{const s=String(v??'');return /^\d{4}-\d{2}-\d{2}$/.test(s)?s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4):s;};
- const today=new Date(),localToday=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
- document.getElementById('roomSummary').textContent=`${roomShowAll?'Todos los meses y años':MONTHS[month-1]+' '+year} · ${records.length} grupos · ${records.reduce((n,r)=>n+ROOM_KEYS.reduce((a,k)=>a+(Number(r[k])||0),0),0)} habitaciones`;
- const html='<thead><tr>'+heads.map(h=>'<th>'+roomEsc(h)+'</th>').join('')+'</tr></thead><tbody>'+records.map(r=>'<tr>'+fields.map((h,i)=>{
- let v=String(r[h]??'');
- if(ROOM_KEYS.includes(h)&&Number(v)===0)v='';
- if(h==='Total')v=String(ROOM_KEYS.reduce((n,k)=>n+(Number(r[k])||0),0));
- if(['Fecha de entrada','Fecha de salida','Fecha limite'].includes(h))v=dateFmt(v);
- const status=String(r.Status||'').toLowerCase();
- const cls=h==='Status'?(status==='definitivo'?'room-def':status==='tentativo'?'room-ten':''):(h==='Fecha limite'&&/^\d{4}-\d{2}-\d{2}$/.test(String(r[h]||''))&&String(r[h])<=localToday?'room-over':'');
- return `<td class="${cls}${i===0?' room-group':''}">${roomEsc(v)}</td>`;
- }).join('')+'</tr>').join('')+'</tbody>';
- document.getElementById('roomTable').innerHTML=html;
-}
-function roomPrint(){
- // El PDF incluye todo el histórico cargado, independientemente de los filtros de pantalla.
- const heads=['GRUPO','IN','OUT',...ROOM_KEYS,'TOTAL','ESTADO','VENDEDOR','FECHA LÍMITE','CTA. ZUGACLOUD','AUTORIZADO POR'];
- const fields=['Nombre del Grupo','Fecha de entrada','Fecha de salida',...ROOM_KEYS,'Total','Status','Vendedor','Fecha limite','Cta. Zugacloud','Autorizado por'];
- const fmt=v=>{const s=String(v??'');return /^\d{4}-\d{2}-\d{2}$/.test(s)?s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4):s;};
- const now=new Date(),today=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');
- const groups=new Map();
- for(const r of roomRecords){
-   const date=String(r['Fecha de entrada']||'');
-   const match=/^(\d{4})-(\d{2})/.exec(date);
-   const key=match?match[1]+'-'+match[2]:'Sin fecha';
-   if(!groups.has(key))groups.set(key,[]);
-   groups.get(key).push(r);
- }
- const keys=[...groups.keys()].sort((a,b)=>a==='Sin fecha'?1:b==='Sin fecha'?-1:a.localeCompare(b));
- const sections=keys.map(key=>{
-   const records=groups.get(key).slice().sort((a,b)=>String(a['Fecha de entrada']||'').localeCompare(String(b['Fecha de entrada']||'')));
-   const match=/^(\d{4})-(\d{2})$/.exec(key);
-   const monthTitle=match?MONTHS[Number(match[2])-1]+' '+match[1]:'Sin fecha de entrada';
-   const total=records.reduce((n,r)=>n+ROOM_KEYS.reduce((a,k)=>a+(Number(r[k])||0),0),0);
-   const rows=records.map(r=>'<tr>'+fields.map((f,i)=>{
-     let v=f==='Total'?String(ROOM_KEYS.reduce((n,k)=>n+(Number(r[k])||0),0)):String(r[f]??'');
-     if(ROOM_KEYS.includes(f)&&Number(v)===0)v='';
-     if(['Fecha de entrada','Fecha de salida','Fecha limite'].includes(f))v=fmt(v);
-     let cls=i===0?'group ':'';
-     if(f==='Status')cls+=String(r.Status||'').toLowerCase()==='definitivo'?'def':'ten';
-     if(f==='Fecha limite'&&/^\d{4}-\d{2}-\d{2}$/.test(String(r[f]||''))&&String(r[f])<=today)cls+=' due';
-     return '<td class="'+cls+'">'+roomEsc(v)+'</td>';
-   }).join('')+'</tr>').join('');
-   return '<section class="month"><h2>'+roomEsc(monthTitle)+'</h2><p>'+records.length+' grupos · '+total+' habitaciones</p><table><colgroup><col class="groupcol"><col span="2" class="datecol"><col span="'+ROOM_KEYS.length+'" class="numcol"><col class="numcol"><col class="statuscol"><col span="4" class="endcol"></colgroup><thead><tr>'+heads.map(h=>'<th>'+roomEsc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows+'</tbody></table></section>';
- }).join('');
- const printWin=window.open('','_blank');
- if(!printWin){toast('Permite las ventanas emergentes para exportar el PDF.','err');return;}
- const style=`@page{size:A3 landscape;margin:5mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{margin:0;padding:0;font-family:Arial,sans-serif;color:#111}body{padding:0}h1{font-size:17px;text-align:center;margin:0 0 9px}h2{font-size:13px;margin:5px 0}p{font-size:10px;margin:0 0 8px}.month{break-before:page;page-break-before:always;width:100%}.month:first-of-type{break-before:auto;page-break-before:auto}table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:7px}col.groupcol{width:12%}col.datecol{width:5%}col.numcol{width:2.45%}col.statuscol{width:5%}col.endcol{width:5.5%}th,td{border:0.5px solid #aeb6bd;padding:4px 1px;text-align:center;vertical-align:middle;overflow-wrap:anywhere;word-break:normal}th{background:#008c49!important;color:white!important;font-size:6.5px;line-height:1.2}td.group{text-align:left;font-weight:bold}td.def{background:#f11!important;color:#fff!important;font-weight:bold}td.ten{background:#ffe34c!important;color:#111!important;font-weight:bold}td.due{background:#39ff14!important;color:#072600!important;font-weight:bold}tr{break-inside:avoid;page-break-inside:avoid}thead{display:table-header-group}@media screen{body{padding:16px}.month{margin-bottom:35px;border-bottom:1px solid #ccc;padding-bottom:20px}}`;
- printWin.document.open();
- printWin.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Reporte general de bloqueos de habitaciones</title><style>'+style+'</style></head><body><h1>GRUPO DORADOS — REPORTE GENERAL DE BLOQUEOS DE HABITACIONES</h1>'+(sections||'<p>No hay bloqueos registrados.</p>')+'</body></html>');
- printWin.document.close();
- printWin.focus();
- setTimeout(()=>printWin.print(),350);
-}
-window.addEventListener('afterprint',()=>document.body.classList.remove('room-printing'));
-
   const RESET_TOKEN = new URLSearchParams(window.location.search).get('reset') || '';
   const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const SESSION_KEY = 'gd_session_token';
@@ -879,7 +783,42 @@ window.addEventListener('afterprint',()=>document.body.classList.remove('room-pr
     }catch(err){toast(errorText(err),'err')} finally{busy(false)}
   }
 
-  async function enterApp(user){
+
+  // Se consulta al iniciar sesión y cada cuatro minutos; no acumula temporizadores.
+  let deadlineTimer=null, deadlineRequestInFlight=false;
+  function closeDeadlineAlert(){document.getElementById('deadlineAlert').classList.add('hidden');}
+  function stopDeadlineAlerts(){
+    if(deadlineTimer)clearInterval(deadlineTimer);
+    deadlineTimer=null;
+    closeDeadlineAlert();
+  }
+  function startDeadlineAlerts(){
+    stopDeadlineAlerts();
+    checkDeadlineAlerts();
+    deadlineTimer=setInterval(checkDeadlineAlerts,240000);
+  }
+  async function checkDeadlineAlerts(){
+    if(!currentUser || deadlineRequestInFlight)return;
+    deadlineRequestInFlight=true;
+    try{
+      const r=await gas('getDeadlineAlerts',localStorage.getItem(SESSION_KEY));
+      if(!r.ok)throw Error(r.message||'No fue posible consultar las alertas');
+      if(!currentUser)return;
+      const salons=r.salons||[],rooms=r.rooms||[];
+      if(!salons.length&&!rooms.length){closeDeadlineAlert();return;}
+      const section=(title,items,role)=>'<h4>'+title+' ('+items.length+')</h4>'+
+        (items.length?items.map(x=>'<div class="alert-item"><strong>'+escapeHtml(x.nombre||'Sin nombre')+
+        '</strong>'+role+': '+escapeHtml(x.responsable||'No especificado')+
+        '<br>Fecha límite: '+escapeHtml(x.fechaLimite||'')+'</div>').join(''):
+        '<div style="font-size:12px;color:#766c82">Sin bloqueos próximos a vencer.</div>');
+      document.getElementById('deadlineAlertContent').innerHTML=
+        section('Bloqueos de salones',salons,'Usuario')+
+        section('Bloqueos de habitaciones',rooms,'Vendedor');
+      document.getElementById('deadlineAlert').classList.remove('hidden');
+    }catch(e){console.error('Alertas de bloqueos:',e);}
+    finally{deadlineRequestInFlight=false;}
+  }
+\n  async function enterApp(user){
     currentUser=user;
     document.getElementById('authView').classList.add('hidden');
     document.getElementById('appView').classList.remove('hidden');
@@ -888,7 +827,6 @@ window.addEventListener('afterprint',()=>document.body.classList.remove('room-pr
     document.getElementById('avatar').textContent=(user.nombre || 'U').trim().charAt(0).toUpperCase();
     currentUser.tipo=(user.tipo || 'operador').toLowerCase();
     document.getElementById('serviceButton').classList.toggle('hidden', currentUser.tipo!=='administrador');
-    document.getElementById('roomAdminButton').classList.toggle('hidden',currentUser.tipo!=='administrador');
     const myBlocksButton=document.getElementById('myBlocksButton');
     const blocksDisabled=currentUser.tipo==='consulta';
     myBlocksButton.disabled=blocksDisabled;
@@ -1012,7 +950,7 @@ window.addEventListener('afterprint',()=>document.body.classList.remove('room-pr
     }catch(err){toast(errorText(err),'err')}finally{busy(false)}
   }
 
-  async function logout(){
+  async function logout(){\n    stopDeadlineAlerts();
     const token=localStorage.getItem(SESSION_KEY);
     busy(true);
     try{
@@ -2503,20 +2441,5 @@ window.addEventListener('afterprint',()=>document.body.classList.remove('room-pr
     return data;
   }
 </script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('/sw.js')
-        .then(function (registration) {
-          console.log('Service Worker registrado:', registration.scope);
-        })
-        .catch(function (error) {
-          console.error('Error al registrar Service Worker:', error);
-        });
-    });
-  }
-</script>
-  
-  
 </body>
 </html>
