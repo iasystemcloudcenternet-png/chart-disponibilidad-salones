@@ -251,6 +251,21 @@
     @media(max-width:850px){.account-grid{grid-template-columns:1fr}.account-profile{min-height:230px}.users-head{align-items:flex-start;flex-direction:column}}
   </style>
 <style>.room-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin:12px 0}.room-grid label,#roomEditor>label,#roomReport label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}.room-grid input,.room-grid select,#roomExisting,#roomReport select{width:100%;padding:9px;border:1px solid #d7d1e1;border-radius:8px}.room-table{border-collapse:collapse;width:100%;font-size:11px}.room-table th,.room-table td{border:1px solid #bfc4ca;padding:6px;white-space:nowrap}.room-table th{background:#008b4a;color:white}.room-def{background:#f43f46;color:white;font-weight:bold}.room-ten{background:#ffe45c;color:#392800;font-weight:bold}.room-over{background:#ffd3d3;color:#a10000;font-weight:bold}@media print{body.room-printing>*:not(#roomModal){display:none!important}body.room-printing #roomModal{position:static!important;display:block!important;background:white!important;padding:0!important}body.room-printing #roomModal>.modal{max-width:none!important;max-height:none!important;overflow:visible!important;box-shadow:none!important;padding:0!important}body.room-printing #roomModal button,body.room-printing #roomEditor,body.room-printing #roomReport>div:first-child{display:none!important}body.room-printing #roomReport{display:block!important}body.room-printing .room-table{font-size:8px}body.room-printing .room-table th,body.room-printing .room-table td{padding:3px}@page{size:A3 landscape;margin:8mm}}.room-table{width:max-content;min-width:100%;font-size:10px}.room-table th{background:#00ae53;color:#081b11;font-weight:800;text-align:center}.room-table td{text-align:center;min-width:42px}.room-table .room-group{text-align:left;font-weight:700;min-width:240px}.room-table .room-def{background:#ed1111!important;color:white!important}.room-table .room-ten{background:#ffe34c!important;color:#161616!important}.room-table .room-over{background:#ffcece!important;color:#950000!important}@media print{.room-table{width:100%;min-width:0;font-size:6px;table-layout:auto}.room-table th,.room-table td{padding:2px!important;min-width:0!important;white-space:normal;overflow-wrap:anywhere}.room-table .room-group{min-width:0!important;width:100px}body.room-printing #roomPrintable>div{overflow:visible!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style>
+
+<style>
+#deadlineAlert{position:fixed;right:16px;bottom:16px;z-index:1100;width:min(420px,calc(100vw - 32px));max-height:min(72vh,620px);background:#fff;border:3px solid #f5a623;border-radius:20px;box-shadow:0 14px 48px #4c1d9533;overflow:hidden;animation:deadlineGlow 1.8s ease-in-out infinite alternate}
+@keyframes deadlineGlow{from{box-shadow:0 0 5px #fbbf24,0 14px 38px #4c1d9526}to{box-shadow:0 0 22px #f59e0b,0 14px 38px #4c1d9544}}
+.deadline-top{display:flex;align-items:center;gap:12px;padding:13px 14px;background:#fffbeb;border-bottom:1px solid #fde68a}
+.deadline-sun{font-size:49px;display:inline-block;animation:deadlineDance .7s ease-in-out infinite alternate;transform-origin:center bottom}
+@keyframes deadlineDance{from{transform:rotate(-17deg) translateY(2px)}to{transform:rotate(17deg) translateY(-7px)}}
+.deadline-top strong{font-size:15px;color:#6b3b04;flex:1}
+.deadline-close{border:0;background:#f3e8d3;border-radius:9px;padding:7px 11px;cursor:pointer;font-size:20px}
+.deadline-body{overflow:auto;max-height:calc(min(72vh,620px) - 90px);padding:12px 15px}
+.deadline-body h4{margin:10px 0;color:#5b21b6;font-size:13px}
+.deadline-item{border-bottom:1px solid #eee;padding:9px 0;font-size:12px;line-height:1.55}
+.deadline-item b{display:block;font-size:13px;color:#241b35}
+.deadline-date{color:#b45309;font-weight:800}
+</style>
 </head>
 <body>
 <div class="app-shell">
@@ -774,7 +789,44 @@ function roomPrint(){
  if(!printWin){toast('Permite las ventanas emergentes para exportar el PDF.','err');return;}
  const style=`@page{size:A3 landscape;margin:5mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{margin:0;padding:0;font-family:Arial,sans-serif;color:#111}body{padding:0}h1{font-size:17px;text-align:center;margin:0 0 9px}h2{font-size:13px;margin:5px 0}p{font-size:10px;margin:0 0 8px}.month{break-before:page;page-break-before:always;width:100%}.month:first-of-type{break-before:auto;page-break-before:auto}table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:7px}col.groupcol{width:12%}col.datecol{width:5%}col.numcol{width:2.45%}col.statuscol{width:5%}col.endcol{width:5.5%}th,td{border:0.5px solid #aeb6bd;padding:4px 1px;text-align:center;vertical-align:middle;overflow-wrap:anywhere;word-break:normal}th{background:#008c49!important;color:white!important;font-size:6.5px;line-height:1.2}td.group{text-align:left;font-weight:bold}td.def{background:#f11!important;color:#fff!important;font-weight:bold}td.ten{background:#ffe34c!important;color:#111!important;font-weight:bold}td.due{background:#39ff14!important;color:#072600!important;font-weight:bold}tr{break-inside:avoid;page-break-inside:avoid}thead{display:table-header-group}@media screen{body{padding:16px}.month{margin-bottom:35px;border-bottom:1px solid #ccc;padding-bottom:20px}}`;
  printWin.document.open();
- printWin.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Reporte general de bloqueos de habitaciones</title><style>'+style+'</style></head><body><h1>GRUPO DORADOS — REPORTE GENERAL DE BLOQUEOS DE HABITACIONES</h1>'+(sections||'<p>No hay bloqueos registrados.</p>')+'</body></html>');
+ printWin.document.write('<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Reporte general de bloqueos de habitaciones</title><style>'+style+'</style></head><body><h1>GRUPO DORADOS — REPORTE GENERAL DE BLOQUEOS DE HABITACIONES</h1>'+(sections||'<p>No hay bloqueos registrados.</p>')+'
+<div id="deadlineAlert" class="hidden" role="dialog" aria-label="Bloqueos próximos a vencer">
+  <div class="deadline-top"><span class="deadline-sun" aria-hidden="true">🌞</span><strong>Bloqueos próximos a vencer</strong><button type="button" class="deadline-close" onclick="closeDeadlineAlert()" aria-label="Cerrar">×</button></div>
+  <div id="deadlineAlertBody" class="deadline-body"></div>
+</div>
+
+<script>
+let deadlineAlertTimer=null;
+let deadlineAlertRunning=false;
+function deadlineEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function closeDeadlineAlert(){document.getElementById('deadlineAlert')?.classList.add('hidden');}
+function stopDeadlineAlerts(){if(deadlineAlertTimer)clearInterval(deadlineAlertTimer);deadlineAlertTimer=null;closeDeadlineAlert();}
+function startDeadlineAlerts(){
+  stopDeadlineAlerts();
+  checkDeadlineAlerts();
+  deadlineAlertTimer=setInterval(checkDeadlineAlerts,4*60*1000);
+}
+async function checkDeadlineAlerts(){
+  if(deadlineAlertRunning || !currentUser)return;
+  const token=localStorage.getItem(SESSION_KEY);
+  if(!token)return;
+  deadlineAlertRunning=true;
+  try{
+    const data=await gas('getUpcomingDeadlineAlerts',token);
+    if(!data?.ok)throw Error(data?.message||'No se pudieron consultar las alertas');
+    const salons=data.salones||[],rooms=data.habitaciones||[];
+    if(!salons.length&&!rooms.length){closeDeadlineAlert();return;}
+    const makeItems=(items,role)=>items.map(x=>`<div class="deadline-item"><b>${deadlineEsc(x.nombre)}</b>${role}: ${deadlineEsc(x.responsable)}<div class="deadline-date">Fecha límite: ${deadlineEsc(x.fechaLimite)}</div></div>`).join('');
+    document.getElementById('deadlineAlertBody').innerHTML=
+      `<p style="font-size:12px;margin:0">Seguimiento informativo de vencimientos entre hoy y los próximos 3 días.</p>`+
+      (salons.length?`<h4>🏛️ Salones (${salons.length})</h4>${makeItems(salons,'Usuario')}`:'')+
+      (rooms.length?`<h4>🛏️ Habitaciones (${rooms.length})</h4>${makeItems(rooms,'Vendedor')}`:'');
+    if(currentUser)document.getElementById('deadlineAlert').classList.remove('hidden');
+  }catch(e){console.warn('Alertas de vencimiento:',e);}
+  finally{deadlineAlertRunning=false;}
+}
+</script>
+</body></html>');
  printWin.document.close();
  printWin.focus();
  setTimeout(()=>printWin.print(),350);
@@ -895,6 +947,7 @@ window.addEventListener('afterprint',()=>document.body.classList.remove('room-pr
     myBlocksButton.title=blocksDisabled?'Esta opción no está disponible para usuarios Consulta.':'';
     await loadYears();
     await loadAvailability();
+    startDeadlineAlerts();
   }
 
 
@@ -1024,6 +1077,7 @@ window.addEventListener('afterprint',()=>document.body.classList.remove('room-pr
       // Siempre eliminamos la sesión local y regresamos al Login.
       localStorage.removeItem(SESSION_KEY);
       currentUser=null;
+      stopDeadlineAlerts();
 
       const accountModal=document.getElementById('accountModal');
       if(accountModal) accountModal.classList.add('hidden');
